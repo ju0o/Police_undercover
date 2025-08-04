@@ -1,0 +1,21 @@
+{
+  "name": "police-undercover-web",
+  "version": "1.0.0",
+  "description": "Police Undercover Web Game - Full Stack Application",
+  "scripts": {
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": ["game", "multiplayer", "socket.io", "react", "vite"],
+  "author": "Police Undercover Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
