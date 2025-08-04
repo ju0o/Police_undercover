@@ -117,10 +117,17 @@ function App() {
     // 연결 이벤트 리스너
     newSocket.on('connect', () => {
       console.log('Connected to server');
-      setGameState(prev => ({ ...prev, isConnected: true, error: null }));
+      setGameState(prev => ({ 
+        ...prev, 
+        isConnected: true, 
+        error: null,
+        // 로딩 중이었다면 메뉴로 이동
+        phase: prev.phase === 'loading' ? 'menu' : prev.phase
+      }));
       
       // 연결되면 방 목록 요청
       newSocket.emit('getRooms', (rooms: any[]) => {
+        console.log('Rooms received:', rooms);
         setAvailableRooms(rooms || []);
       });
     });
@@ -138,9 +145,9 @@ function App() {
       console.error('Connection error:', error);
       console.error('Error details:', {
         message: error.message,
-        description: error.description,
-        context: error.context,
-        type: error.type
+        description: (error as any).description,
+        context: (error as any).context,
+        type: (error as any).type
       });
       setGameState(prev => ({ 
         ...prev, 
@@ -268,9 +275,6 @@ function App() {
     
     setGameState(prev => ({ ...prev, phase: 'loading' }));
     
-    // 소켓 연결 시작
-    socket.connect();
-    
     setPlayerData({
       id: socket.id || '',
       nickname,
@@ -282,17 +286,31 @@ function App() {
       completedMissions: []
     });
     
-    // 연결 성공 후 메인 메뉴로 이동
+    // 소켓 연결 시작
+    socket.connect();
+    
+    // 연결 타임아웃 후 강제로 메인 메뉴로 이동 (fallback)
     setTimeout(() => {
       if (socket.connected) {
         setGameState(prev => ({ ...prev, phase: 'menu' }));
+      } else {
+        console.warn('Socket connection failed, proceeding to menu anyway');
+        setGameState(prev => ({ ...prev, phase: 'menu', error: 'Connection unstable - some features may not work' }));
       }
-    }, 1000);
+    }, 3000);
   };
 
   // 방 생성 (새로운 시그니처)
   const handleCreateRoom = (roomName: string, isPrivate: boolean) => {
-    if (!socket || !playerData) return;
+    if (!socket || !playerData) {
+      setGameState(prev => ({ ...prev, error: 'Connection not established. Please try again.' }));
+      return;
+    }
+    
+    if (!socket.connected) {
+      setGameState(prev => ({ ...prev, error: 'Server connection lost. Please refresh the page.' }));
+      return;
+    }
     
     const options = { isPrivate };
     
@@ -301,7 +319,7 @@ function App() {
       nickname: playerData.nickname, 
       options 
     }, (response: any) => {
-      if (response.success) {
+      if (response && response.success) {
         setRoomData(response.room);
         setGameState(prev => ({ ...prev, phase: 'room' }));
         setPlayerData(prev => prev ? { ...prev, isHost: true } : null);
@@ -316,7 +334,7 @@ function App() {
           });
         }
       } else {
-        setGameState(prev => ({ ...prev, error: response.message }));
+        setGameState(prev => ({ ...prev, error: response?.message || 'Failed to create room' }));
       }
     });
   };
