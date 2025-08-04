@@ -42,19 +42,21 @@ app.get('/health', (req, res) => {
 
 const server = http.createServer(app);
 
-// Socket.IO 서버 생성 - Railway 호환 설정
+// Socket.IO 서버 생성 - Railway 호환 설정 (메모리 최적화)
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   },
-  allowEIO3: true, // Engine.IO v3 호환성
-  transports: ['polling'], // Railway에서 polling만 사용
-  pingTimeout: 60000,
-  pingInterval: 25000,
-  upgradeTimeout: 30000,
-  maxHttpBufferSize: 1e6
+  allowEIO3: true,
+  transports: ['polling'],
+  pingTimeout: 30000, // 메모리 절약을 위해 단축
+  pingInterval: 15000,
+  upgradeTimeout: 10000,
+  maxHttpBufferSize: 5e5, // 500KB로 제한
+  connectTimeout: 20000,
+  serveClient: false // 클라이언트 파일 서빙 비활성화
 });
 
 io.on('connection', (socket) => {
@@ -150,24 +152,66 @@ io.on('connection', (socket) => {
   });
 
   // === 연결 해제(퇴장/위치삭제) ===
-  socket.on('disconnect', () => {
-    for (const roomName of roomManager.getAllRooms()) {
-      moveManager.removePlayer(roomName, socket.id);
-      roomManager.leaveRoom(roomName, socket.id);
-      io.to(roomName).emit('roomPlayers', roomManager.getRoomPlayers(roomName));
-      io.to(roomName).emit('positionsUpdate', moveManager.getAllPositions(roomName));
-      io.emit('roomsUpdated', roomManager.getAllRooms());
+  socket.on('disconnect', (reason) => {
+    console.log('🔌 User disconnected:', socket.id, 'Reason:', reason);
+    
+    try {
+      // 모든 룸에서 플레이어 제거
+      const allRooms = roomManager.getAllRooms();
+      for (const roomName of allRooms) {
+        moveManager.removePlayer(roomName, socket.id);
+        roomManager.leaveRoom(roomName, socket.id);
+        
+        // 룸이 비어있다면 정리
+        const remainingPlayers = roomManager.getRoomPlayers(roomName);
+        if (remainingPlayers.length === 0) {
+          roomManager.deleteRoom(roomName);
+        } else {
+          io.to(roomName).emit('roomPlayers', remainingPlayers);
+        }
+      }
+      
+      // 공개방 목록 업데이트
+      io.emit('roomsUpdated', roomManager.getPublicRooms());
+    } catch (error) {
+      console.error('Error handling disconnect:', error);
     }
-    console.log('User disconnected:', socket.id);
   });
 
   // === (여기 아래부터 미션/회의/킬/채팅 등 추가) ===
 });
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, '0.0.0.0', () => {
+const serverInstance = server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server listening on port ${PORT}`);
   console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
   console.log('🔒 CORS origins:', allowedOrigins);
   console.log('📡 Client URL:', process.env.CLIENT_URL || 'using default');
+});
+
+// Graceful shutdown 처리
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received, shutting down gracefully...');
+  
+  // 새로운 연결 받지 않음
+  serverInstance.close(() => {
+    console.log('📴 HTTP server closed');
+    
+    // Socket.IO 서버 종료
+    io.close(() => {
+      console.log('🔌 Socket.IO server closed');
+      process.exit(0);
+    });
+  });
+  
+  // 30초 후 강제 종료
+  setTimeout(() => {
+    console.error('⚠️ Could not close connections in time, forcefully shutting down');
+    process.exit(1);
+  }, 30000);
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT received, shutting down gracefully...');
+  process.exit(0);
 });

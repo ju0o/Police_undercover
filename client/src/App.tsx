@@ -69,6 +69,7 @@ function App() {
     error: null,
     isConnected: false
   });
+  const [connectionAttempted, setConnectionAttempted] = useState(false);
 
   // 플레이어 및 방 데이터
   const [playerData, setPlayerData] = useState<PlayerData | null>(null);
@@ -110,9 +111,7 @@ function App() {
       transports: ['polling'], // Railway에서 WebSocket 문제 시 polling만 사용
       upgrade: true,
       forceNew: false, // Railway에서 false가 더 안정적
-      rememberUpgrade: false,
-      pingTimeout: 60000,
-      pingInterval: 25000
+      rememberUpgrade: false
     });
 
     setSocket(newSocket);
@@ -288,6 +287,9 @@ function App() {
       isAlive: true,
       completedMissions: []
     });
+    
+    // 연결 시도 표시
+    setConnectionAttempted(true);
     
     // 소켓 연결 시작
     socket.connect();
@@ -500,11 +502,11 @@ function App() {
         onToggle={() => setShowControlsOverlay(prev => !prev)}
       />
 
-      {/* 연결 상태 표시 (게임 중이 아닐 때만) */}
-      {gameState.phase !== 'game' && gameState.phase !== 'meeting' && gameState.phase !== 'voting' && (
+      {/* 연결 상태 표시 (연결 시도 후 && 게임 중이 아닐 때만) */}
+      {connectionAttempted && gameState.phase !== 'game' && gameState.phase !== 'meeting' && gameState.phase !== 'voting' && (
         <div className={`connection-status ${gameState.isConnected ? 'connected' : 'disconnected'}`}>
           <div className="status-indicator"></div>
-          <span>{gameState.isConnected ? '연결됨' : '연결 끊김'}</span>
+          <span>{gameState.isConnected ? '연결됨' : '연결 불안정'}</span>
         </div>
       )}
     </div>
