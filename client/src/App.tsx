@@ -8,12 +8,13 @@ import './App.css';
 // 컴포넌트 imports
 import LoginScreen from './components/LoginScreen';
 import MainMenu from './components/MainMenu';
-import Lobby from './features/lobby/Lobby';
+// import Lobby from './features/lobby/Lobby'; // 현재 사용하지 않음
 import GameRoom from './features/game/GameRoom';
 import GameResults from './features/result/GameResults';
 import LoadingScreen from './components/LoadingScreen';
 import ErrorModal from './components/ErrorModal';
 import SettingsModal from './components/SettingsModal';
+import ControlsOverlay from './components/ControlsOverlay';
 
 // 타입 정의
 interface GameState {
@@ -76,6 +77,7 @@ function App() {
 
   // UI 상태
   const [showSettings, setShowSettings] = useState(false);
+  const [showControlsOverlay, setShowControlsOverlay] = useState(false);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [notifications, setNotifications] = useState<any[]>([]);
 
@@ -111,6 +113,11 @@ function App() {
     newSocket.on('connect', () => {
       console.log('Connected to server');
       setGameState(prev => ({ ...prev, isConnected: true, error: null }));
+      
+      // 연결되면 방 목록 요청
+      newSocket.emit('getRooms', (rooms: any[]) => {
+        setAvailableRooms(rooms || []);
+      });
     });
 
     newSocket.on('disconnect', (reason) => {
@@ -455,11 +462,19 @@ function App() {
         ))}
       </div>
 
-      {/* 연결 상태 표시 */}
-      <div className={`connection-status ${gameState.isConnected ? 'connected' : 'disconnected'}`}>
-        <div className="status-indicator"></div>
-        <span>{gameState.isConnected ? '연결됨' : '연결 끊김'}</span>
-      </div>
+      {/* 작동법 오버레이 */}
+      <ControlsOverlay 
+        isVisible={showControlsOverlay}
+        onToggle={() => setShowControlsOverlay(prev => !prev)}
+      />
+
+      {/* 연결 상태 표시 (게임 중이 아닐 때만) */}
+      {gameState.phase !== 'game' && gameState.phase !== 'meeting' && gameState.phase !== 'voting' && (
+        <div className={`connection-status ${gameState.isConnected ? 'connected' : 'disconnected'}`}>
+          <div className="status-indicator"></div>
+          <span>{gameState.isConnected ? '연결됨' : '연결 끊김'}</span>
+        </div>
+      )}
     </div>
   );
 }

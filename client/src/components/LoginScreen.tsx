@@ -12,6 +12,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const [nickname, setNickname] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [showGameInfo, setShowGameInfo] = useState<boolean>(false);
+  const [showControls, setShowControls] = useState<boolean>(false);
 
   // 닉네임 유효성 검사
   const validateNickname = (name: string): boolean => {
@@ -113,47 +115,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           </button>
         </div>
 
-        {/* 게임 정보 */}
-        <div className="game-info">
-          <h3>게임 소개</h3>
-          <ul>
-            <li>🎭 9가지 역할로 플레이</li>
-            <li>🎯 20개 이상의 다양한 미션</li>
-            <li>🗳️ 전략적 회의와 투표</li>
-            <li>📊 상세한 통계 시스템</li>
-            <li>🎮 실시간 멀티플레이어</li>
-          </ul>
-        </div>
-
-        {/* 조작법 안내 */}
-        <div className="controls-info">
-          <h3>조작법</h3>
-          <div className="controls-grid">
-            <div className="control-item">
-              <span className="key">WASD</span>
-              <span className="description">이동</span>
-            </div>
-            <div className="control-item">
-              <span className="key">SPACE</span>
-              <span className="description">액션/미션</span>
-            </div>
-            <div className="control-item">
-              <span className="key">TAB</span>
-              <span className="description">지도/정보</span>
-            </div>
-            <div className="control-item">
-              <span className="key">R</span>
-              <span className="description">신고</span>
-            </div>
-            <div className="control-item">
-              <span className="key">Q</span>
-              <span className="description">킬/능력</span>
-            </div>
-            <div className="control-item">
-              <span className="key">E</span>
-              <span className="description">긴급회의</span>
-            </div>
-          </div>
+        {/* 정보 버튼들 */}
+        <div className="info-buttons">
+          <button onClick={() => setShowGameInfo(true)} className="info-btn">
+            🎮 게임 소개
+          </button>
+          <button onClick={() => setShowControls(true)} className="info-btn">
+            ⌨️ 조작법
+          </button>
         </div>
 
         {/* 버전 정보 */}
@@ -161,6 +130,72 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           <p>Version 1.0.0 | Made with React & Socket.io</p>
         </div>
       </div>
+
+      {/* 게임 소개 모달 */}
+      {showGameInfo && (
+        <div className="modal-overlay" onClick={() => setShowGameInfo(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>🎮 게임 소개</h3>
+            <div className="modal-content">
+              <ul className="game-features">
+                <li>🎭 9가지 역할로 플레이</li>
+                <li>🎯 20개 이상의 다양한 미션</li>
+                <li>🗳️ 전략적 회의와 투표</li>
+                <li>📊 상세한 통계 시스템</li>
+                <li>🎮 실시간 멀티플레이어</li>
+                <li>🔒 공개방 & 비공개방 지원</li>
+              </ul>
+            </div>
+            <button onClick={() => setShowGameInfo(false)} className="close-btn">
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 조작법 모달 */}
+      {showControls && (
+        <div className="modal-overlay" onClick={() => setShowControls(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>⌨️ 조작법</h3>
+            <div className="modal-content">
+              <div className="controls-grid">
+                <div className="control-item">
+                  <span className="key">WASD</span>
+                  <span className="description">이동</span>
+                </div>
+                <div className="control-item">
+                  <span className="key">SPACE</span>
+                  <span className="description">액션/미션</span>
+                </div>
+                <div className="control-item">
+                  <span className="key">TAB</span>
+                  <span className="description">지도/정보</span>
+                </div>
+                <div className="control-item">
+                  <span className="key">R</span>
+                  <span className="description">신고</span>
+                </div>
+                <div className="control-item">
+                  <span className="key">Q</span>
+                  <span className="description">킬/능력</span>
+                </div>
+                <div className="control-item">
+                  <span className="key">E</span>
+                  <span className="description">긴급회의</span>
+                </div>
+                <div className="control-item">
+                  <span className="key">H</span>
+                  <span className="description">조작법 표시/숨김</span>
+                </div>
+              </div>
+            </div>
+            <button onClick={() => setShowControls(false)} className="close-btn">
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

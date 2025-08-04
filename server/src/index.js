@@ -28,6 +28,14 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
+  // === 방 목록 요청 ===
+  socket.on('getRooms', (callback) => {
+    const publicRooms = roomManager.getPublicRooms();
+    if (typeof callback === 'function') {
+      callback(publicRooms);
+    }
+  });
+
   // === 방 생성 ===
   socket.on('createRoom', ({ roomName, nickname, options = {} }, callback) => {
     // 비공개방인 경우 랜덤 코드 생성
