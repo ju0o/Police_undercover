@@ -42,17 +42,25 @@ app.get('/health', (req, res) => {
 
 const server = http.createServer(app);
 
-// Socket.IO 서버 생성 - CORS 설정 동일하게 적용
+// Socket.IO 서버 생성 - Railway 호환 설정
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
-  }
+  },
+  allowEIO3: true, // Engine.IO v3 호환성
+  transports: ['polling'], // Railway에서 polling만 사용
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  upgradeTimeout: 30000,
+  maxHttpBufferSize: 1e6
 });
 
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  console.log('🔗 User connected:', socket.id);
+  console.log('🌐 User origin:', socket.handshake.headers.origin);
+  console.log('🚀 Transport:', socket.conn.transport.name);
 
   // === 방 목록 요청 ===
   socket.on('getRooms', (callback) => {

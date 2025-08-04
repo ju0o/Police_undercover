@@ -104,12 +104,15 @@ function App() {
     const newSocket = io(serverUrl, {
       autoConnect: false,
       reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
-      timeout: 20000,
-      transports: ['polling', 'websocket'], // polling을 먼저 시도
+      reconnectionDelay: 2000,
+      reconnectionAttempts: 10,
+      timeout: 30000,
+      transports: ['polling'], // Railway에서 WebSocket 문제 시 polling만 사용
       upgrade: true,
-      forceNew: true
+      forceNew: false, // Railway에서 false가 더 안정적
+      rememberUpgrade: false,
+      pingTimeout: 60000,
+      pingInterval: 25000
     });
 
     setSocket(newSocket);
