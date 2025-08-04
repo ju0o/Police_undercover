@@ -27,16 +27,28 @@ npx @railway/cli init
 npx @railway/cli up
 ```
 
-## 3. 환경변수 설정
+## 3. 환경변수 설정 ⚠️ **중요**
 
-Railway 대시보드 → 프로젝트 → Variables에서 다음 설정:
+Railway 대시보드 → 프로젝트 → Variables에서 다음 환경변수를 **반드시** 설정하세요:
 
+### 필수 환경변수
 ```bash
 NODE_ENV=production
-PORT=$PORT  # Railway가 자동 설정
-CLIENT_URL=https://your-firebase-app.web.app
-SOCKET_CORS_ORIGIN=https://your-firebase-app.web.app
+CLIENT_URL=https://metacraze-c393c.web.app
 ```
+
+### 자동 설정되는 변수 (설정 불필요)
+```bash
+PORT=자동설정  # Railway가 자동으로 할당
+```
+
+### 환경변수 설정 방법
+1. Railway 대시보드에서 프로젝트 클릭
+2. **Variables** 탭 클릭
+3. **New Variable** 클릭하여 각각 추가:
+   - Name: `NODE_ENV`, Value: `production`
+   - Name: `CLIENT_URL`, Value: `https://metacraze-c393c.web.app`
+4. **Deploy** 버튼 클릭하여 재배포
 
 ## 4. 빌드 설정 확인
 

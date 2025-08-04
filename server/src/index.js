@@ -9,8 +9,16 @@ const roleManager = require('./roles/roleManager');
 const moveManager = require('./game/moveManager');
 
 const app = express();
+
+// CORS 설정 - 환경변수로 클라이언트 URL 관리
+const allowedOrigins = [
+  process.env.CLIENT_URL || "https://metacraze-c393c.web.app",
+  "http://localhost:5173", 
+  "http://localhost:3001"
+];
+
 app.use(cors({
-  origin: ["https://metacraze-c393c.web.app", "http://localhost:5173", "http://localhost:3001"],
+  origin: allowedOrigins,
   methods: ["GET", "POST"],
   credentials: true
 }));
@@ -34,9 +42,10 @@ app.get('/health', (req, res) => {
 
 const server = http.createServer(app);
 
+// Socket.IO 서버 생성 - CORS 설정 동일하게 적용
 const io = new Server(server, {
   cors: {
-    origin: ["https://metacraze-c393c.web.app", "http://localhost:5173", "http://localhost:3001"],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -149,7 +158,8 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server listening on port ${PORT}`);
-  console.log('Environment:', process.env.NODE_ENV || 'development');
-  console.log('CORS origins configured for Socket.IO and Express');
+  console.log(`🚀 Server listening on port ${PORT}`);
+  console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
+  console.log('🔒 CORS origins:', allowedOrigins);
+  console.log('📡 Client URL:', process.env.CLIENT_URL || 'using default');
 });
