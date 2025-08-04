@@ -15,8 +15,11 @@ const app = express();
 // CORS 설정 - 환경변수로 클라이언트 URL 관리
 const allowedOrigins = [
   process.env.CLIENT_URL || "https://metacraze-c393c.web.app",
+  "https://metacraze-c393c.web.app",
+  "https://metacraze-c393c.firebaseapp.com",
   "http://localhost:5173", 
-  "http://localhost:3001"
+  "http://localhost:3001",
+  "*" // 모든 도메인 허용 (Render 호환)
 ];
 
 app.use(cors({
@@ -47,12 +50,13 @@ const server = http.createServer(app);
 // Socket.IO 서버 생성 - Railway 호환 설정 (메모리 최적화)
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "*", // 임시로 모든 도메인 허용
     methods: ["GET", "POST"],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ["*"]
   },
   allowEIO3: true,
-  transports: ['polling'],
+  transports: ['polling', 'websocket'],
   pingTimeout: 30000,
   pingInterval: 15000,
   upgradeTimeout: 10000,
@@ -626,7 +630,7 @@ function getMissionDifficulty(missionId) {
 // 서버 시작
 // ============================
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 const serverInstance = server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server listening on port ${PORT}`);
   console.log('🌍 Environment:', process.env.NODE_ENV || 'development');

@@ -1,5 +1,5 @@
-// [client/src/features/lobby/Lobby.tsx] - 메인 로비 컴포넌트
-// 방 목록, 방 생성, 방 입장 기능
+// [client/src/features/lobby/Lobby.tsx] - 경찰/언더커버 컨셉 로비 컴포넌트
+// 완전한 게임 모드 커스터마이징 기능 포함
 
 import { useState } from 'react';
 import './Lobby.css';
@@ -10,8 +10,11 @@ interface Room {
   maxPlayers: number;
   gameState: string;
   hasPassword: boolean;
-  hostName: string;
-  options: any;
+  hostName?: string;
+  options?: any;
+  createdAt?: number;
+  gameMode?: string;
+  map?: string;
 }
 
 interface LobbyProps {
@@ -22,6 +25,54 @@ interface LobbyProps {
   onLogout: () => void;
   onOpenSettings: () => void;
 }
+
+// 게임 모드 프리셋
+const GAME_MODES = {
+  classic: {
+    name: '클래식 모드',
+    description: '기본적인 경찰 vs 언더커버 게임',
+    impostorCount: 1,
+    crewCount: 7,
+    missions: ['electrical_wires', 'fuel_engine', 'fix_lights', 'clear_asteroids', 'swipe_card'],
+    killCooldown: 30,
+    emergencyMeetings: 1,
+    discussionTime: 120,
+    votingTime: 30
+  },
+  detective: {
+    name: '탐정 모드',
+    description: '탐정이 포함된 고급 게임',
+    impostorCount: 2,
+    crewCount: 8,
+    missions: ['electrical_wires', 'fuel_engine', 'fix_lights', 'clear_asteroids', 'swipe_card', 'security_code', 'reaction_test'],
+    killCooldown: 25,
+    emergencyMeetings: 2,
+    discussionTime: 150,
+    votingTime: 45
+  },
+  undercover: {
+    name: '언더커버 모드',
+    description: '다중 언더커버가 있는 복잡한 게임',
+    impostorCount: 3,
+    crewCount: 9,
+    missions: ['electrical_wires', 'fuel_engine', 'fix_lights', 'clear_asteroids', 'swipe_card', 'security_code', 'reaction_test', 'memory_game'],
+    killCooldown: 20,
+    emergencyMeetings: 3,
+    discussionTime: 180,
+    votingTime: 60
+  },
+  custom: {
+    name: '커스텀 모드',
+    description: '완전히 커스터마이징 가능한 게임',
+    impostorCount: 1,
+    crewCount: 7,
+    missions: ['electrical_wires', 'fuel_engine', 'fix_lights'],
+    killCooldown: 30,
+    emergencyMeetings: 1,
+    discussionTime: 120,
+    votingTime: 30
+  }
+};
 
 const Lobby: React.FC<LobbyProps> = ({
   playerName,
@@ -35,15 +86,18 @@ const Lobby: React.FC<LobbyProps> = ({
   const [joinPassword, setJoinPassword] = useState<string>('');
   const [selectedRoom, setSelectedRoom] = useState<string>('');
   const [showPasswordModal, setShowPasswordModal] = useState<boolean>(false);
+  const [selectedGameMode, setSelectedGameMode] = useState<string>('classic');
 
   // 방 생성 폼 상태
   const [createForm, setCreateForm] = useState({
     roomName: '',
     password: '',
     maxPlayers: 10,
+    impostorCount: 1,
+    crewCount: 7,
     killCooldown: 30,
-    emergencyMeetings: 3,
-    discussionTime: 60,
+    emergencyMeetings: 1,
+    discussionTime: 120,
     votingTime: 30,
     anonymousVotes: false,
     taskbarUpdates: true,
@@ -51,13 +105,38 @@ const Lobby: React.FC<LobbyProps> = ({
     skipVoteMethod: 'majority',
     gameSpeed: 1,
     multipleImpostors: true,
-    confirmEjects: true
+    confirmEjects: true,
+    selectedMissions: ['electrical_wires', 'fuel_engine', 'fix_lights', 'clear_asteroids', 'swipe_card'],
+    gameMode: 'classic',
+    map: 'spaceship',
+    isPrivate: false
   });
 
   // 새로고침으로 방 목록 업데이트
   const refreshRooms = () => {
-    // 실제로는 서버에서 방 목록을 다시 요청
     console.log('Refreshing room list...');
+    // 실제로는 부모 컴포넌트에서 방 목록을 다시 가져오는 함수를 호출해야 함
+    // 여기서는 로컬 상태를 초기화하는 역할만 함
+  };
+
+  // 게임 모드 변경 처리
+  const handleGameModeChange = (mode: string) => {
+    setSelectedGameMode(mode);
+    const gameMode = GAME_MODES[mode as keyof typeof GAME_MODES];
+    
+    if (gameMode) {
+      setCreateForm(prev => ({
+        ...prev,
+        impostorCount: gameMode.impostorCount,
+        crewCount: gameMode.crewCount,
+        missions: gameMode.missions,
+        killCooldown: gameMode.killCooldown,
+        emergencyMeetings: gameMode.emergencyMeetings,
+        discussionTime: gameMode.discussionTime,
+        votingTime: gameMode.votingTime,
+        maxPlayers: gameMode.impostorCount + gameMode.crewCount
+      }));
+    }
   };
 
   // 방 생성 처리
@@ -72,8 +151,17 @@ const Lobby: React.FC<LobbyProps> = ({
       return;
     }
 
+    // 특수문자 검증
+    const validNameRegex = /^[a-zA-Z0-9가-힣\s]+$/;
+    if (!validNameRegex.test(createForm.roomName.trim())) {
+      alert('방 이름에는 영문, 숫자, 한글, 공백만 사용 가능합니다.');
+      return;
+    }
+
     const options = {
       maxPlayers: createForm.maxPlayers,
+      impostorCount: createForm.impostorCount,
+      crewCount: createForm.crewCount,
       killCooldown: createForm.killCooldown,
       emergencyMeetings: createForm.emergencyMeetings,
       discussionTime: createForm.discussionTime,
@@ -84,7 +172,11 @@ const Lobby: React.FC<LobbyProps> = ({
       skipVoteMethod: createForm.skipVoteMethod,
       gameSpeed: createForm.gameSpeed,
       multipleImpostors: createForm.multipleImpostors,
-      confirmEjects: createForm.confirmEjects
+      confirmEjects: createForm.confirmEjects,
+      selectedMissions: createForm.selectedMissions,
+      gameMode: selectedGameMode,
+      map: createForm.map,
+      isPrivate: createForm.isPrivate
     };
 
     onCreateRoom(
@@ -94,7 +186,14 @@ const Lobby: React.FC<LobbyProps> = ({
     );
 
     setShowCreateRoom(false);
-    setCreateForm({ ...createForm, roomName: '', password: '' });
+    setCreateForm({ 
+      ...createForm, 
+      roomName: '', 
+      password: '',
+      gameMode: 'classic',
+      map: 'spaceship',
+      isPrivate: false
+    });
   };
 
   // 방 입장 처리
@@ -122,6 +221,16 @@ const Lobby: React.FC<LobbyProps> = ({
     setCreateForm(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  // 미션 선택 처리
+  const handleMissionToggle = (missionId: string) => {
+    setCreateForm(prev => ({
+      ...prev,
+      selectedMissions: prev.selectedMissions.includes(missionId)
+        ? prev.selectedMissions.filter(id => id !== missionId)
+        : [...prev.selectedMissions, missionId]
     }));
   };
 
@@ -180,14 +289,24 @@ const Lobby: React.FC<LobbyProps> = ({
           </div>
 
           <div className="room-list">
-            {rooms.length === 0 ? (
+            {rooms.filter(room => room && room.name && room.name.trim() !== '').length === 0 ? (
               <div className="no-rooms">
-                <p>현재 생성된 방이 없습니다.</p>
+                <p>현재 활성화된 방이 없습니다.</p>
                 <p>새로운 방을 만들어보세요!</p>
+                <button 
+                  onClick={refreshRooms}
+                  className="refresh-btn"
+                  style={{ marginTop: '15px' }}
+                >
+                  🔄 새로고침
+                </button>
               </div>
             ) : (
-              rooms.map((room, index) => (
-                <div key={index} className="room-card">
+              rooms
+                .filter(room => room && room.name && room.name.trim() !== '') // 유효한 방만 필터링
+                .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)) // 최신순 정렬
+                .map((room, index) => (
+                <div key={`${room.name}-${index}`} className="room-card">
                   <div className="room-info">
                     <div className="room-header">
                       <h4 className="room-name">
@@ -202,9 +321,19 @@ const Lobby: React.FC<LobbyProps> = ({
                       <span className="player-count">
                         👥 {room.playerCount}/{room.maxPlayers}
                       </span>
-                      <span className="host-name">
-                        🎭 {room.hostName}
-                      </span>
+                      {room.hostName && (
+                        <span className="host-name">
+                          🎭 {room.hostName}
+                        </span>
+                      )}
+                      {room.gameMode && (
+                        <span className="game-mode">
+                          🎮 {room.gameMode === 'classic' ? '클래식' : 
+                              room.gameMode === 'detective' ? '탐정' : 
+                              room.gameMode === 'undercover' ? '언더커버' : 
+                              room.gameMode === 'custom' ? '커스텀' : room.gameMode}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="room-actions">
@@ -267,6 +396,7 @@ const Lobby: React.FC<LobbyProps> = ({
             </div>
             
             <div className="modal-content">
+              {/* 기본 정보 */}
               <div className="form-group">
                 <label>방 이름</label>
                 <input
@@ -288,21 +418,65 @@ const Lobby: React.FC<LobbyProps> = ({
                 />
               </div>
 
+              {/* 게임 모드 선택 */}
+              <div className="form-group">
+                <label>게임 모드</label>
+                <div className="game-mode-selector">
+                  {Object.entries(GAME_MODES).map(([key, mode]) => (
+                    <div
+                      key={key}
+                      className={`game-mode-option ${selectedGameMode === key ? 'selected' : ''}`}
+                      onClick={() => handleGameModeChange(key)}
+                    >
+                      <div className="mode-header">
+                        <h4>{mode.name}</h4>
+                        <span className="mode-description">{mode.description}</span>
+                      </div>
+                      <div className="mode-details">
+                        <span>언더커버: {mode.impostorCount}명</span>
+                        <span>경찰: {mode.crewCount}명</span>
+                        <span>미션: {mode.missions.length}개</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 플레이어 수 설정 */}
               <div className="form-row">
                 <div className="form-group">
-                  <label>최대 플레이어</label>
+                  <label>언더커버 수</label>
                   <select
-                    value={createForm.maxPlayers}
-                    onChange={(e) => handleFormChange('maxPlayers', parseInt(e.target.value))}
+                    value={createForm.impostorCount}
+                    onChange={(e) => handleFormChange('impostorCount', parseInt(e.target.value))}
+                    disabled={selectedGameMode !== 'custom'}
                   >
-                    <option value={6}>6명</option>
-                    <option value={8}>8명</option>
-                    <option value={10}>10명</option>
-                    <option value={12}>12명</option>
-                    <option value={15}>15명</option>
+                    <option value={1}>1명</option>
+                    <option value={2}>2명</option>
+                    <option value={3}>3명</option>
+                    <option value={4}>4명</option>
                   </select>
                 </div>
 
+                <div className="form-group">
+                  <label>경찰 수</label>
+                  <select
+                    value={createForm.crewCount}
+                    onChange={(e) => handleFormChange('crewCount', parseInt(e.target.value))}
+                    disabled={selectedGameMode !== 'custom'}
+                  >
+                    <option value={5}>5명</option>
+                    <option value={6}>6명</option>
+                    <option value={7}>7명</option>
+                    <option value={8}>8명</option>
+                    <option value={9}>9명</option>
+                    <option value={10}>10명</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* 게임 설정 */}
+              <div className="form-row">
                 <div className="form-group">
                   <label>킬 쿨다운</label>
                   <select
@@ -316,6 +490,21 @@ const Lobby: React.FC<LobbyProps> = ({
                     <option value={35}>35초</option>
                     <option value={40}>40초</option>
                     <option value={45}>45초</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>긴급 회의 횟수</label>
+                  <select
+                    value={createForm.emergencyMeetings}
+                    onChange={(e) => handleFormChange('emergencyMeetings', parseInt(e.target.value))}
+                  >
+                    <option value={0}>0번</option>
+                    <option value={1}>1번</option>
+                    <option value={2}>2번</option>
+                    <option value={3}>3번</option>
+                    <option value={4}>4번</option>
+                    <option value={5}>5번</option>
                   </select>
                 </div>
               </div>
@@ -332,6 +521,8 @@ const Lobby: React.FC<LobbyProps> = ({
                     <option value={60}>60초</option>
                     <option value={90}>90초</option>
                     <option value={120}>120초</option>
+                    <option value={150}>150초</option>
+                    <option value={180}>180초</option>
                   </select>
                 </div>
 
@@ -349,21 +540,48 @@ const Lobby: React.FC<LobbyProps> = ({
                 </div>
               </div>
 
+              {/* 미션 선택 (커스텀 모드에서만) */}
+              {selectedGameMode === 'custom' && (
+                <div className="form-group">
+                  <label>미션 선택</label>
+                  <div className="mission-selector">
+                    {Object.entries({
+                      'electrical_wires': '전선 연결',
+                      'fuel_engine': '엔진 연료 주입',
+                      'fix_lights': '조명 수리',
+                      'clear_asteroids': '소행성 제거',
+                      'swipe_card': '카드 인증',
+                      'security_code': '보안 코드 입력',
+                      'reaction_test': '반응 속도 테스트',
+                      'memory_game': '기억력 게임'
+                    }).map(([id, name]) => (
+                      <label key={id} className="mission-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={createForm.selectedMissions.includes(id)}
+                          onChange={() => handleMissionToggle(id)}
+                        />
+                        <span>{name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 맵 선택 */}
               <div className="form-group">
-                <label>긴급 회의 횟수</label>
+                <label>맵 선택</label>
                 <select
-                  value={createForm.emergencyMeetings}
-                  onChange={(e) => handleFormChange('emergencyMeetings', parseInt(e.target.value))}
+                  value={createForm.map}
+                  onChange={(e) => handleFormChange('map', e.target.value)}
                 >
-                  <option value={0}>0번</option>
-                  <option value={1}>1번</option>
-                  <option value={2}>2번</option>
-                  <option value={3}>3번</option>
-                  <option value={4}>4번</option>
-                  <option value={5}>5번</option>
+                  <option value="spaceship">우주선</option>
+                  <option value="office">사무실</option>
+                  <option value="laboratory">연구소</option>
                 </select>
               </div>
 
+              {/* 추가 옵션 */}
               <div className="checkbox-group">
                 <label className="checkbox-item">
                   <input
@@ -398,7 +616,16 @@ const Lobby: React.FC<LobbyProps> = ({
                     checked={createForm.multipleImpostors}
                     onChange={(e) => handleFormChange('multipleImpostors', e.target.checked)}
                   />
-                  다중 임포스터
+                  다중 언더커버
+                </label>
+
+                <label className="checkbox-item">
+                  <input
+                    type="checkbox"
+                    checked={createForm.isPrivate}
+                    onChange={(e) => handleFormChange('isPrivate', e.target.checked)}
+                  />
+                  비공개 방 (초대 코드 필요)
                 </label>
               </div>
             </div>

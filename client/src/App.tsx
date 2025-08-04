@@ -4,15 +4,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import './App.css';
+import { SERVER_URL, SOCKET_CONFIG } from './config';
 
 // 타입 imports
-import {
+import type {
   GameState,
   PlayerData,
   RoomData,
   Settings,
   Notification,
-  GameResults,
+  GameResults as GameResultsType,
   PublicRoom,
   Role,
   MissionProgress,
@@ -69,9 +70,9 @@ function App() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // 게임 데이터
-  const [gameResults, setGameResults] = useState<GameResults | null>(null);
+  const [gameResults, setGameResults] = useState<GameResultsType | null>(null);
   const [myMissions, setMyMissions] = useState<string[]>([]);
-  const [teammates, setTeammates] = useState<PlayerData[]>([]);
+
 
   // ============================
   // 알림 시스템
@@ -106,20 +107,10 @@ function App() {
     }
 
     // 서버 URL 설정
-    const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
-    console.log('Connecting to server:', serverUrl);
+    console.log('Connecting to server:', SERVER_URL);
+    console.log('Socket config:', SOCKET_CONFIG);
     
-    const newSocket = io(serverUrl, {
-      autoConnect: false,
-      reconnection: true,
-      reconnectionDelay: 2000,
-      reconnectionAttempts: 10,
-      timeout: 30000,
-      transports: ['polling'],
-      upgrade: true,
-      forceNew: false,
-      rememberUpgrade: false
-    });
+    const newSocket = io(SERVER_URL, SOCKET_CONFIG);
 
     setSocket(newSocket);
 
@@ -128,7 +119,10 @@ function App() {
     // ============================
 
     newSocket.on('connect', () => {
-      console.log('Connected to server');
+      console.log('✅ Connected to server successfully!');
+      console.log('🔗 Socket ID:', newSocket.id);
+      console.log('🚀 Transport:', newSocket.io.engine.transport.name);
+      
       setGameState(prev => ({ 
         ...prev, 
         isConnected: true, 
@@ -138,7 +132,7 @@ function App() {
       
       // 연결되면 방 목록 요청
       newSocket.emit('getRooms', (rooms: PublicRoom[]) => {
-        console.log('Rooms received:', rooms);
+        console.log('📋 Rooms received:', rooms);
         setAvailableRooms(rooms || []);
       });
     });
@@ -152,8 +146,18 @@ function App() {
       }));
     });
 
-    newSocket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
+    newSocket.on('connect_error', (error: any) => {
+      console.error('❌ Connection error:', error);
+      console.error('🔍 Error details:', {
+        message: error.message,
+        description: error.description || 'No description',
+        context: error.context || 'No context',
+        type: error.type || 'Unknown type',
+        stack: error.stack
+      });
+      console.error('🌐 Trying to connect to:', SERVER_URL);
+      console.error('⚙️ Socket config:', SOCKET_CONFIG);
+      
       setGameState(prev => ({ 
         ...prev, 
         isConnected: false, 
@@ -181,7 +185,7 @@ function App() {
       console.log('Game started:', data);
       setPlayerData(prev => prev ? { ...prev, role: data.role } : null);
       setMyMissions(data.missions);
-      setTeammates(data.teammates);
+
       setGameState(prev => ({ ...prev, phase: 'playing' }));
       
       showNotification({
@@ -244,7 +248,7 @@ function App() {
       // 투표 현황 UI 업데이트는 GameRoom 컴포넌트에서 처리
     });
 
-    newSocket.on('gameEnded', (results: GameResults) => {
+    newSocket.on('gameEnded', (results: GameResultsType) => {
       console.log('Game ended:', results);
       setGameResults(results);
       setGameState(prev => ({ ...prev, phase: 'results' }));
@@ -272,7 +276,7 @@ function App() {
       console.log('Room reset');
       setGameState(prev => ({ ...prev, phase: 'lobby' }));
       setMyMissions([]);
-      setTeammates([]);
+
       setGameResults(null);
     });
 
@@ -347,7 +351,7 @@ function App() {
           error: 'Connection unstable - some features may not work' 
         }));
       }
-    }, 3000);
+    }, 10000); // 10초로 증가
   }, [socket]);
 
   const handleCreateRoom = useCallback((roomName: string, isPrivate: boolean) => {
@@ -429,7 +433,6 @@ function App() {
     socket.disconnect();
     setRoomData(null);
     setMyMissions([]);
-    setTeammates([]);
     setGameResults(null);
     setGameState(prev => ({ ...prev, phase: 'menu' }));
     
@@ -450,7 +453,6 @@ function App() {
     setPlayerData(null);
     setRoomData(null);
     setMyMissions([]);
-    setTeammates([]);
     setGameResults(null);
     setConnectionAttempted(false);
     setGameState({ phase: 'login', error: null, isConnected: false });
@@ -490,7 +492,6 @@ function App() {
           playerData={playerData}
           gamePhase={gameState.phase}
           myMissions={myMissions}
-          teammates={teammates}
           settings={settings}
           onLeaveRoom={handleLeaveRoom}
         />
@@ -517,8 +518,29 @@ function App() {
       {showSettings && (
         <SettingsModal
           isOpen={true}
-          settings={settings}
-          onSettingsChange={setSettings}
+          settings={{
+            sound: {
+              master: settings.volume || 50,
+              music: settings.musicEnabled ? (settings.volume || 50) : 0,
+              sfx: settings.soundEnabled ? (settings.volume || 50) : 0
+            },
+            graphics: {
+              quality: 'medium',
+              fullscreen: false,
+              vsync: true
+            },
+            controls: {
+              keybindings: {}
+            }
+          }}
+          onSettingsChange={(newSettings) => {
+            setSettings(prev => ({
+              ...prev,
+              volume: newSettings.sound.master,
+              soundEnabled: newSettings.sound.sfx > 0,
+              musicEnabled: newSettings.sound.music > 0
+            }));
+          }}
           onClose={() => setShowSettings(false)}
         />
       )}

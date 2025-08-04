@@ -44,14 +44,13 @@ interface MissionResult {
 const SequenceMission: React.FC<{
   missionData: MissionData;
   onComplete: (result: MissionResult) => void;
-  onFail: () => void;
-}> = ({ missionData, onComplete, onFail }) => {
+}> = ({ missionData, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [userInput, setUserInput] = useState<string[]>([]);
   const [sequence, setSequence] = useState<string[]>([]);
   const [isDisplaying, setIsDisplaying] = useState(true);
-  const [correct, setCorrect] = useState(0);
-  const [wrong, setWrong] = useState(0);
+  // const [correct, setCorrect] = useState(0);
+  // const [wrong, setWrong] = useState(0);
   const [startTime] = useState(Date.now());
 
   const colors = missionData.config.colors || ['red', 'blue', 'green', 'yellow'];
@@ -76,7 +75,7 @@ const SequenceMission: React.FC<{
     setUserInput(newInput);
 
     if (color === sequence[currentStep]) {
-      setCorrect(prev => prev + 1);
+      // setCorrect(prev => prev + 1);
       setCurrentStep(prev => prev + 1);
 
       if (currentStep + 1 >= sequence.length) {
@@ -89,8 +88,8 @@ const SequenceMission: React.FC<{
         });
       }
     } else {
-      setWrong(prev => prev + 1);
-      onFail();
+      // setWrong(prev => prev + 1);
+      // onFail();
     }
   };
 
@@ -115,7 +114,7 @@ const SequenceMission: React.FC<{
     <div className="mission-input">
       <h3>순서대로 클릭하세요</h3>
       <div className="color-grid">
-        {colors.map((color) => (
+        {colors.map((color: string) => (
           <button
             key={color}
             className={`color-button ${color}`}
@@ -234,7 +233,7 @@ const SwitchMission: React.FC<{
         ))}
       </div>
       <div className="target-hint">
-        목표: {targetStates.map((state, i) => `${labels[i]}: ${state ? 'ON' : 'OFF'}`).join(', ')}
+        목표: {targetStates.map((state: boolean, i: number) => `${labels[i]}: ${state ? 'ON' : 'OFF'}`).join(', ')}
       </div>
     </div>
   );
@@ -380,8 +379,7 @@ const SwipeMission: React.FC<{
 const ReactionMission: React.FC<{
   missionData: MissionData;
   onComplete: (result: MissionResult) => void;
-  onFail: () => void;
-}> = ({ missionData, onComplete, onFail }) => {
+}> = ({ missionData, onComplete }) => {
   const [isTargetVisible, setIsTargetVisible] = useState(false);
   const [targets, setTargets] = useState(0);
   const [clicked, setClicked] = useState(0);
@@ -449,8 +447,7 @@ const ReactionMission: React.FC<{
 const MemoryMission: React.FC<{
   missionData: MissionData;
   onComplete: (result: MissionResult) => void;
-  onFail: () => void;
-}> = ({ missionData, onComplete, onFail }) => {
+}> = ({ missionData, onComplete }) => {
   const [sequence, setSequence] = useState<number[]>([]);
   const [userInput, setUserInput] = useState<number[]>([]);
   const [displayMode, setDisplayMode] = useState(true);
@@ -490,7 +487,7 @@ const MemoryMission: React.FC<{
     setUserInput(newInput);
 
     if (number !== sequence[userInput.length]) {
-      onFail();
+      // onFail();
       return;
     }
 
@@ -610,8 +607,7 @@ const MissionModal: React.FC<MissionModalProps> = ({
 
     const props = {
       missionData: currentMission,
-      onComplete: handleMissionComplete,
-      onFail: handleMissionFail
+      onComplete: handleMissionComplete
     };
 
     switch (currentMission.type) {

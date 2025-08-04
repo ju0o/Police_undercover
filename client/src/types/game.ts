@@ -69,13 +69,19 @@ export interface RoomOptions {
   password?: string;
   gameMode: 'classic' | 'custom' | 'detective';
   map: 'spaceship' | 'office' | 'laboratory';
+  killCooldown: number;
+  discussionTime: number;
+  votingTime: number;
+  emergencyMeetings: number;
+  crewCount?: number;
+  selectedMissions?: string[];
 }
 
 export interface RoomData {
   name: string;
   players: PlayerData[];
   options: RoomOptions;
-  gameState: string;
+  gameState?: string;
   hostId?: string;
   createdAt?: number;
 }
@@ -220,6 +226,15 @@ export interface GameResults {
   winner: 'crewmate' | 'impostor';
   players: PlayerResult[];
   gameStats: GameStats;
+  // 서버에서 오는 추가 필드들
+  winningTeam?: string;
+  gameLength?: number;
+  totalKills?: number;
+  totalMissions?: number;
+  completedMissions?: number;
+  meetingsCalled?: number;
+  mvpPlayer?: PlayerResult | null;
+  statistics?: any;
 }
 
 // ============================

@@ -10,59 +10,13 @@ import MissionModal from './MissionModal';
 // 타입 정의
 // ============================
 
-interface Player {
-  id: string;
-  nickname: string;
-  isHost: boolean;
-  isReady: boolean;
-  role: {
-    id: string;
-    name: string;
-    team: 'crewmate' | 'impostor' | 'neutral';
-    canKill: boolean;
-    canSabotage: boolean;
-    canVent: boolean;
-    abilities: string[];
-    description: string;
-  } | null;
-  position: { x: number; y: number };
-  isAlive: boolean;
-  completedMissions: string[];
+import type { RoomData, PlayerData } from '../../types/game';
+
+interface Player extends PlayerData {
+  // 기존 Player 인터페이스는 PlayerData를 확장
 }
 
-interface RoomData {
-  name: string;
-  players: Player[];
-  options: {
-    maxPlayers: number;
-    impostorCount: number;
-    detectiveCount: number;
-    isPrivate: boolean;
-    roomCode?: string;
-    password?: string;
-    gameMode: 'classic' | 'custom' | 'detective';
-    map: 'spaceship' | 'office' | 'laboratory';
-    killCooldown: number;
-    discussionTime: number;
-    votingTime: number;
-    emergencyMeetings: number;
-  };
-  gameState: string;
-  hostId?: string;
-  createdAt?: number;
-}
-
-interface GameRoomProps {
-  socket: Socket | null;
-  roomData: RoomData;
-  playerData: Player | null;
-  gamePhase: string;
-  myMissions: string[];
-  teammates: Player[];
-  settings: any;
-  onLeaveRoom: () => void;
-}
-
+// MissionData와 MissionResult 타입 정의
 interface MissionData {
   id: string;
   name: string;
@@ -79,6 +33,16 @@ interface MissionResult {
   timeSpent?: number;
   accuracy?: number;
   steps?: number;
+}
+
+interface GameRoomProps {
+  socket: Socket | null;
+  roomData: RoomData;
+  playerData: Player | null;
+  gamePhase: string;
+  myMissions: string[];
+  settings: any;
+  onLeaveRoom: () => void;
 }
 
 // ============================
@@ -103,8 +67,7 @@ const GameRoom: React.FC<GameRoomProps> = ({
   playerData,
   gamePhase,
   myMissions,
-  teammates,
-  settings,
+
   onLeaveRoom
 }) => {
   // ============================
@@ -120,9 +83,10 @@ const GameRoom: React.FC<GameRoomProps> = ({
   const [showMap, setShowMap] = useState<boolean>(false);
   const [showKillButton, setShowKillButton] = useState<boolean>(false);
   const [gameTime, setGameTime] = useState<number>(0);
-  const [meetingData, setMeetingData] = useState<any>(null);
-  const [votingData, setVotingData] = useState<any>(null);
-  const [myVote, setMyVote] = useState<string | null>(null);
+  // const [meetingData, setMeetingData] = useState<any>(null);
+  // const [votingData, setVotingData] = useState<any>(null);
+
+  // const [myVote, setMyVote] = useState<string | null>(null);
 
   // 키 입력 상태
   const [keysPressed, setKeysPressed] = useState<{[key: string]: boolean}>({});
@@ -152,25 +116,25 @@ const GameRoom: React.FC<GameRoomProps> = ({
     });
 
     // 게임 시작
-    socket.on('gameStarted', (data: { role: any; teammates: Player[]; missions: string[] }) => {
+    socket.on('gameStarted', (_data: { role: any; teammates: Player[]; missions: string[] }) => {
       gameStartTime.current = Date.now();
       setGameTime(0);
     });
 
     // 회의 시작
-    socket.on('meetingStarted', (data: any) => {
-      setMeetingData(data);
+    socket.on('meetingStarted', (_data: any) => {
+      // setMeetingData(data);
     });
 
     // 투표 시작
     socket.on('votingStarted', () => {
-      setVotingData({ phase: 'voting' });
-      setMyVote(null);
+      // setVotingData({ phase: 'voting' });
+      // setMyVote(null);
     });
 
     // 투표 업데이트
-    socket.on('votingUpdate', (data: any) => {
-      setVotingData((prev: any) => ({ ...prev, ...data }));
+    socket.on('votingUpdate', (_data: any) => {
+      // setVotingData((prev: any) => ({ ...prev, ...data }));
     });
 
     // 게임 종료
@@ -380,7 +344,7 @@ const GameRoom: React.FC<GameRoomProps> = ({
     if (!socket || !playerData) return;
 
     // 미션 확인
-    const availableMission = myMissions.find(missionId => {
+    const availableMission = myMissions.find(_missionId => {
       // 실제로는 미션 위치를 확인해야 함
       return true; // 임시로 모든 미션을 사용 가능하게
     });
@@ -415,16 +379,16 @@ const GameRoom: React.FC<GameRoomProps> = ({
     setCurrentMission(null);
   }, [socket, roomData, currentMission]);
 
-  const handleVote = useCallback((targetId: string) => {
-    if (!socket || myVote !== null) return;
+  // const handleVote = useCallback((targetId: string) => {
+  //   if (!socket || myVote !== null) return;
 
-    socket.emit('castVote', {
-      roomName: roomData.name,
-      targetId: targetId
-    });
+  //   socket.emit('castVote', {
+  //     roomName: roomData.name,
+  //     targetId: targetId
+  //   });
 
-    setMyVote(targetId);
-  }, [socket, roomData, myVote]);
+  //   setMyVote(targetId);
+  // }, [socket, roomData, myVote]);
 
   // ============================
   // 타이머 효과
@@ -673,22 +637,102 @@ const GameRoom: React.FC<GameRoomProps> = ({
         <div className="modal-overlay">
           <div className="map-modal">
             <div className="map-header">
-              <h3>지도</h3>
+              <h3>경찰서 지도</h3>
               <button onClick={() => setShowMap(false)}>×</button>
             </div>
+            
             <div className="mini-map">
+              {/* 맵 영역들 */}
+              <div className="map-areas">
+                <div className="map-area crewmate-area" style={{
+                  left: '10%', top: '10%', width: '30%', height: '25%'
+                }}>
+                  사무실
+                </div>
+                <div className="map-area common-area" style={{
+                  left: '45%', top: '15%', width: '20%', height: '20%'
+                }}>
+                  로비
+                </div>
+                <div className="map-area impostor-area" style={{
+                  left: '70%', top: '20%', width: '25%', height: '30%'
+                }}>
+                  보안실
+                </div>
+                <div className="map-area crewmate-area" style={{
+                  left: '15%', top: '50%', width: '25%', height: '25%'
+                }}>
+                  증거실
+                </div>
+                <div className="map-area common-area" style={{
+                  left: '50%', top: '50%', width: '30%', height: '30%'
+                }}>
+                  중앙홀
+                </div>
+                <div className="map-area impostor-area" style={{
+                  left: '85%', top: '60%', width: '10%', height: '20%'
+                }}>
+                  창고
+                </div>
+              </div>
+              
+              {/* 플레이어들 */}
               <div className="map-players">
                 {allPlayers.map(player => (
                   <div
                     key={player.id}
-                    className={`map-player ${player.id === playerData?.id ? 'me' : ''}`}
+                    className={`map-player ${player.id === playerData?.id ? 'me' : ''} ${player.role?.team || ''} ${!player.isAlive ? 'dead' : ''}`}
                     style={{
                       left: `${(player.position.x / WORLD_WIDTH) * 100}%`,
                       top: `${(player.position.y / WORLD_HEIGHT) * 100}%`
                     }}
+                    title={`${player.nickname} (${player.role?.name || '역할 없음'})`}
                   />
                 ))}
               </div>
+              
+              {/* 줌 컨트롤 */}
+              <div className="map-zoom">
+                <button className="zoom-btn" onClick={() => {}}>+</button>
+                <button className="zoom-btn" onClick={() => {}}>-</button>
+              </div>
+              
+              {/* 필터 */}
+              <div className="map-filters">
+                <button className="map-filter-btn active">전체</button>
+                <button className="map-filter-btn">크루메이트</button>
+                <button className="map-filter-btn">임포스터</button>
+              </div>
+            </div>
+            
+            {/* 맵 범례 */}
+            <div className="map-legend">
+              <h4>범례</h4>
+              <div className="legend-items">
+                <div className="legend-item">
+                  <div className="legend-color me"></div>
+                  <span>나</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-color crewmate"></div>
+                  <span>크루메이트</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-color impostor"></div>
+                  <span>임포스터</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-color dead"></div>
+                  <span>사망</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* 맵 컨트롤 */}
+            <div className="map-controls">
+              <button className="map-control-btn">실시간 업데이트</button>
+              <button className="map-control-btn">위치 공유</button>
+              <button className="map-control-btn">경로 표시</button>
             </div>
           </div>
         </div>

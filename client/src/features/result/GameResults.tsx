@@ -4,32 +4,12 @@
 import React, { useState } from 'react';
 import './GameResults.css';
 
-interface PlayerResult {
-  id: string;
-  nickname: string;
-  role: any;
-  isWinner: boolean;
-  kills: number;
-  deaths: number;
-  missionsCompleted: number;
-  voteAccuracy: number;
-  survivalTime: number;
-  achievements: string[];
-}
+// PlayerResult는 types/game.ts에서 import
+
+import type { GameResults as GameResultsType } from '../../types/game';
 
 interface GameResultsProps {
-  results: {
-    winCondition: string;
-    winningTeam: string;
-    gameLength: number;
-    totalKills: number;
-    totalMissions: number;
-    completedMissions: number;
-    meetingsCalled: number;
-    playerResults: PlayerResult[];
-    mvpPlayer: PlayerResult | null;
-    statistics: any;
-  };
+  results: GameResultsType;
   playerData: any;
   onPlayAgain: () => void;
   onBackToLobby: () => void;
@@ -105,7 +85,7 @@ const GameResults: React.FC<GameResultsProps> = ({
   const renderOverviewTab = () => (
     <div className="overview-tab">
       <div className="game-result-header">
-        <div className="result-banner" style={{ backgroundColor: getTeamColor(results.winningTeam) }}>
+        <div className="result-banner" style={{ backgroundColor: getTeamColor(results.winningTeam || '') }}>
           <h2>
             {results.winningTeam === 'crewmate' ? '🚀 크루메이트 승리!' : 
              results.winningTeam === 'impostor' ? '👹 임포스터 승리!' : '🎭 중립 역할 승리!'}
@@ -123,9 +103,9 @@ const GameResults: React.FC<GameResultsProps> = ({
                 <span className="mvp-role-name">({results.mvpPlayer.role.name})</span>
               </div>
               <div className="mvp-stats">
-                <div>킬: {results.mvpPlayer.kills}</div>
-                <div>미션: {results.mvpPlayer.missionsCompleted}</div>
-                <div>투표 정확도: {results.mvpPlayer.voteAccuracy.toFixed(1)}%</div>
+                <div>킬: {(results.mvpPlayer as any)?.kills || 0}</div>
+                <div>미션: {(results.mvpPlayer as any)?.missionsCompleted || 0}</div>
+                <div>투표 정확도: {(results.mvpPlayer as any)?.voteAccuracy?.toFixed(1) || '0.0'}%</div>
               </div>
             </div>
           </div>
@@ -137,7 +117,7 @@ const GameResults: React.FC<GameResultsProps> = ({
         <div className="summary-grid">
           <div className="summary-item">
             <div className="summary-label">게임 시간</div>
-            <div className="summary-value">{formatGameTime(results.gameLength)}</div>
+            <div className="summary-value">{formatGameTime(results.gameLength || 0)}</div>
           </div>
           <div className="summary-item">
             <div className="summary-label">총 킬</div>
@@ -191,9 +171,9 @@ const GameResults: React.FC<GameResultsProps> = ({
     <div className="players-tab">
       <h3>플레이어 결과</h3>
       <div className="players-results">
-        {results.playerResults
-          .sort((a, b) => (b.isWinner ? 1 : 0) - (a.isWinner ? 1 : 0))
-          .map((player, index) => (
+        {(results as any).playerResults
+          .sort((a: any, b: any) => (b.isWinner ? 1 : 0) - (a.isWinner ? 1 : 0))
+          .map((player: any, index: number) => (
             <div key={player.id} className="player-result-card">
               <div className="player-result-header">
                 <div className="player-rank">#{index + 1}</div>
@@ -251,16 +231,16 @@ const GameResults: React.FC<GameResultsProps> = ({
         <div className="team-stats">
           <div className="team-stat-card crewmate">
             <h5>🚀 크루메이트</h5>
-            <div>플레이어: {results.playerResults.filter(p => p.role.team === 'crewmate').length}명</div>
+            <div>플레이어: {(results as any).playerResults.filter((p: any) => p.role.team === 'crewmate').length}명</div>
             <div>미션 완료: {results.completedMissions}/{results.totalMissions}</div>
-            <div>생존자: {results.playerResults.filter(p => p.role.team === 'crewmate' && p.deaths === 0).length}명</div>
+                          <div>생존자: {(results as any).playerResults.filter((p: any) => p.role.team === 'crewmate' && p.deaths === 0).length}명</div>
           </div>
           
           <div className="team-stat-card impostor">
             <h5>👹 임포스터</h5>
-            <div>플레이어: {results.playerResults.filter(p => p.role.team === 'impostor').length}명</div>
+            <div>플레이어: {(results as any).playerResults.filter((p: any) => p.role.team === 'impostor').length}명</div>
             <div>총 킬: {results.totalKills}</div>
-            <div>생존자: {results.playerResults.filter(p => p.role.team === 'impostor' && p.deaths === 0).length}명</div>
+                          <div>생존자: {(results as any).playerResults.filter((p: any) => p.role.team === 'impostor' && p.deaths === 0).length}명</div>
           </div>
         </div>
       </div>
@@ -269,7 +249,7 @@ const GameResults: React.FC<GameResultsProps> = ({
         <h4>역할별 통계</h4>
         <div className="role-stats">
           {Object.entries(
-            results.playerResults.reduce((acc: any, player) => {
+            (results as any).playerResults.reduce((acc: any, player: any) => {
               const roleId = player.role.id;
               if (!acc[roleId]) {
                 acc[roleId] = {
