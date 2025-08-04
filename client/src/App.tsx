@@ -107,7 +107,9 @@ function App() {
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
       timeout: 20000,
-      transports: ['websocket', 'polling']
+      transports: ['polling', 'websocket'], // polling을 먼저 시도
+      upgrade: true,
+      forceNew: true
     });
 
     setSocket(newSocket);
@@ -134,10 +136,16 @@ function App() {
 
     newSocket.on('connect_error', (error) => {
       console.error('Connection error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        description: error.description,
+        context: error.context,
+        type: error.type
+      });
       setGameState(prev => ({ 
         ...prev, 
         isConnected: false, 
-        error: 'Failed to connect to server'
+        error: `Failed to connect to server: ${error.message}`
       }));
     });
 
