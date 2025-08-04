@@ -6,7 +6,16 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(rm:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npm install)",
+      "Bash(npm test)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(npm install:*)",
+      "Bash(railway login:*)",
+      "Bash(npx @railway/cli:*)"
     ],
     "deny": []
   }

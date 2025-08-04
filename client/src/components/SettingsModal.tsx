@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SettingsModal.css';
 
-interface Settings {
+interface ModalSettings {
   sound: {
     master: number;
     music: number;
@@ -20,8 +20,8 @@ interface Settings {
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  settings: Settings;
-  onSettingsChange: (settings: Settings) => void;
+  settings: ModalSettings;
+  onSettingsChange: (settings: ModalSettings) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -30,12 +30,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   settings,
   onSettingsChange
 }) => {
-  const [currentSettings, setCurrentSettings] = useState<Settings>(settings);
+  const [currentSettings, setCurrentSettings] = useState<ModalSettings>(settings);
   const [activeTab, setActiveTab] = useState<'sound' | 'graphics' | 'controls'>('sound');
 
   if (!isOpen) return null;
 
-  const handleSettingChange = (category: keyof Settings, key: string, value: any) => {
+  const handleSettingChange = (category: keyof ModalSettings, key: string, value: any) => {
     const newSettings = {
       ...currentSettings,
       [category]: {

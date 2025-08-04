@@ -1,7 +1,7 @@
 // [client/src/features/lobby/Lobby.tsx] - 메인 로비 컴포넌트
 // 방 목록, 방 생성, 방 입장 기능
 
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './Lobby.css';
 
 interface Room {

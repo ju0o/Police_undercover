@@ -1,6 +1,6 @@
 // [client/src/features/game/MeetingModal.tsx]
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 type Player = { id: string; nickname: string; role: string; x: number; y: number };
 

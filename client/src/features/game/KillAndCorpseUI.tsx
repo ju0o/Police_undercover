@@ -1,6 +1,6 @@
 // [client/src/features/game/KillAndCorpseUI.tsx]
 
-import React from 'react';
+// React import not needed for JSX transform
 
 type Player = {
   id: string;

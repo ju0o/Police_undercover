@@ -1,7 +1,7 @@
 // [client/src/features/game/GameRoom.tsx] - 게임룸 메인 컴포넌트
 // 게임 플레이, 이동, UI 등 모든 게임 기능
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import './GameRoom.css';
 
@@ -33,24 +33,21 @@ const GameRoom: React.FC<GameRoomProps> = ({
   playerData,
   gamePhase,
   myMissions,
-  teammates,
-  settings,
+  teammates: _teammates,
+  settings: _settings,
   onLeaveRoom
 }) => {
   const [allPlayers, setAllPlayers] = useState<Player[]>([]);
   const [showMissionModal, setShowMissionModal] = useState<boolean>(false);
   const [showKillButton, setShowKillButton] = useState<boolean>(false);
-  const [showEmergencyButton, setShowEmergencyButton] = useState<boolean>(true);
-  const [showMeetingModal, setShowMeetingModal] = useState<boolean>(false);
   const [showMap, setShowMap] = useState<boolean>(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [nearbyPlayers, setNearbyPlayers] = useState<Player[]>([]);
   const [currentMission, setCurrentMission] = useState<any>(null);
   const [killCooldown, setKillCooldown] = useState<number>(0);
   const [emergencyMeetingsLeft, setEmergencyMeetingsLeft] = useState<number>(3);
   
   const gameCanvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number>(0);
 
   // 키 입력 상태 관리
   const [keysPressed, setKeysPressed] = useState<{[key: string]: boolean}>({});
@@ -92,7 +89,7 @@ const GameRoom: React.FC<GameRoomProps> = ({
       switch (e.code) {
         case 'KeyE':
           if (gamePhase === 'game' && emergencyMeetingsLeft > 0) {
-            handleEmergencyMeeting();
+            handleEmergencyMeeting(socket);
           }
           break;
         case 'KeyR':
@@ -210,10 +207,10 @@ const GameRoom: React.FC<GameRoomProps> = ({
   };
 
   // 긴급 회의 소집
-  const handleEmergencyMeeting = () => {
-    if (!socket || emergencyMeetingsLeft <= 0) return;
+  const handleEmergencyMeeting = (currentSocket: Socket | null) => {
+    if (!currentSocket || emergencyMeetingsLeft <= 0) return;
 
-    socket.emit('emergencyMeeting', {
+    currentSocket.emit('emergencyMeeting', {
       roomName: roomData.name,
       callerId: playerData?.id
     });
@@ -464,7 +461,7 @@ const GameRoom: React.FC<GameRoomProps> = ({
           <button 
             className={`action-btn emergency-btn ${emergencyMeetingsLeft > 0 ? 'active' : ''}`}
             disabled={emergencyMeetingsLeft <= 0}
-            onClick={handleEmergencyMeeting}
+            onClick={() => handleEmergencyMeeting(socket)}
           >
             긴급회의 ({emergencyMeetingsLeft}) (E)
           </button>

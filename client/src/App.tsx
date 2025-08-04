@@ -1,7 +1,7 @@
 // [client/src/App.tsx] - 메인 애플리케이션 컴포넌트
 // 전체 게임 상태 관리 및 라우팅
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import './App.css';
 
@@ -46,6 +46,8 @@ interface Settings {
   graphics: 'low' | 'medium' | 'high';
   showFPS: boolean;
   colorBlindMode: boolean;
+  sound?: any;
+  controls?: any;
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -93,7 +95,7 @@ function App() {
     }
 
     // 개발 환경에서는 localhost, 프로덕션에서는 환경변수 사용
-    const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:3001';
+    const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
     const newSocket = io(serverUrl, {
       autoConnect: false,
       reconnection: true,
@@ -170,7 +172,7 @@ function App() {
     });
 
     // 투표 시작
-    newSocket.on('votingStarted', (data) => {
+    newSocket.on('votingStarted', () => {
       setGameState(prev => ({ ...prev, phase: 'voting' }));
     });
 
@@ -392,6 +394,7 @@ function App() {
       {/* 모달들 */}
       {gameState.error && (
         <ErrorModal
+          isOpen={true}
           message={gameState.error}
           onClose={handleErrorClose}
         />
@@ -399,8 +402,9 @@ function App() {
       
       {showSettings && (
         <SettingsModal
-          settings={settings}
-          onUpdateSettings={setSettings}
+          isOpen={true}
+          settings={settings as any}
+          onSettingsChange={setSettings as any}
           onClose={() => setShowSettings(false)}
         />
       )}

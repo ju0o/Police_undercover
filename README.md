@@ -87,6 +87,32 @@ npm run dev
 http://localhost:5173
 ```
 
+## 🌐 배포
+
+### Production URLs
+- **Frontend**: Firebase Hosting에 배포 예정
+- **Backend**: Railway에 배포 예정
+
+### 배포 가이드
+자세한 배포 방법은 `deploy.md` 파일을 참조하세요.
+
+#### Railway (Backend) 배포
+```bash
+npm install -g @railway/cli
+railway login
+railway init
+railway up
+```
+
+#### Firebase (Frontend) 배포
+```bash
+npm install -g firebase-tools
+firebase login
+firebase init hosting
+cd client && npm run build && cd ..
+firebase deploy
+```
+
 ## 🎮 게임 플레이 방법
 
 ### 1. 로그인

@@ -1,6 +1,6 @@
 // [client/src/features/game/MissionModal.tsx]
 
-import React from 'react';
+// React import not needed for JSX transform
 
 type Mission = { id: number; name: string; x: number; y: number };
 
