@@ -47,22 +47,28 @@ app.get('/health', (req, res) => {
 
 const server = http.createServer(app);
 
-// Socket.IO 서버 생성 - Railway 호환 설정 (메모리 최적화)
+// Socket.IO 서버 생성 - Render 최적화 설정
 const io = new Server(server, {
   cors: {
-    origin: "*", // 임시로 모든 도메인 허용
-    methods: ["GET", "POST"],
-    credentials: true,
+    origin: [
+      "https://metacraze-c393c.web.app",
+      "https://metacraze-c393c.firebaseapp.com",
+      "http://localhost:5173",
+      "http://localhost:3000"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: false, // Render에서는 false로 설정
     allowedHeaders: ["*"]
   },
   allowEIO3: true,
   transports: ['polling', 'websocket'],
-  pingTimeout: 30000,
-  pingInterval: 15000,
-  upgradeTimeout: 10000,
-  maxHttpBufferSize: 5e5, // 500KB로 제한
-  connectTimeout: 20000,
-  serveClient: false
+  pingTimeout: 60000, // 더 긴 타임아웃
+  pingInterval: 25000,
+  upgradeTimeout: 30000, // 더 긴 업그레이드 타임아웃
+  maxHttpBufferSize: 1e6, // 1MB로 증가
+  connectTimeout: 45000, // 더 긴 연결 타임아웃
+  serveClient: true, // Render에서는 true로 설정
+  path: '/socket.io/' // 명시적 경로 설정
 });
 
 io.on('connection', (socket) => {
