@@ -468,6 +468,32 @@ function cleanupInactiveRooms() {
 // 정기적으로 비활성 방 정리 (5분마다)
 setInterval(cleanupInactiveRooms, 5 * 60 * 1000);
 
+// 공개방 목록만 반환
+function getPublicRooms() {
+  const publicRooms = [];
+  for (const [roomName, room] of rooms) {
+    if (!room.options.isPrivate) {
+      publicRooms.push({
+        name: roomName,
+        playerCount: room.players.length,
+        maxPlayers: room.options.maxPlayers,
+        gameStarted: room.gameStarted || false
+      });
+    }
+  }
+  return publicRooms;
+}
+
+// 방 코드로 방 찾기
+function findRoomByCode(roomCode) {
+  for (const [roomName, room] of rooms) {
+    if (room.options.roomCode === roomCode) {
+      return { name: roomName, ...room };
+    }
+  }
+  return null;
+}
+
 module.exports = {
   createRoom,
   joinRoom,
@@ -477,6 +503,8 @@ module.exports = {
   getRoom,
   getRoomPlayers,
   getRoomOptions,
+  getPublicRooms,
+  findRoomByCode,
   getAllRooms,
   getAllRoomsInfo,
   banPlayer,

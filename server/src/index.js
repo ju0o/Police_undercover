@@ -9,35 +9,83 @@ const roleManager = require('./roles/roleManager');
 const moveManager = require('./game/moveManager');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ["https://metacraze-c393c.web.app", "http://localhost:5173", "http://localhost:3001"],
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "*" }
+  cors: {
+    origin: ["https://metacraze-c393c.web.app", "http://localhost:5173", "http://localhost:3001"],
+    methods: ["GET", "POST"],
+    credentials: true
+  }
 });
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   // === 방 생성 ===
-  socket.on('createRoom', ({ roomName, nickname }, callback) => {
-    if (roomManager.createRoom(roomName)) {
-      roomManager.joinRoom(roomName, { id: socket.id, nickname });
+  socket.on('createRoom', ({ roomName, nickname, options = {} }, callback) => {
+    // 비공개방인 경우 랜덤 코드 생성
+    if (options.isPrivate) {
+      options.roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+    
+    if (roomManager.createRoom(roomName, options)) {
+      const player = { id: socket.id, nickname, isHost: true };
+      roomManager.joinRoom(roomName, player);
       socket.join(roomName);
-      callback({ success: true });
-      io.emit('roomsUpdated', roomManager.getAllRooms());
+      callback({ 
+        success: true, 
+        room: roomManager.getRoom(roomName),
+        roomCode: options.roomCode 
+      });
+      
+      // 공개방만 전체 목록에 노출
+      if (!options.isPrivate) {
+        io.emit('roomsUpdated', roomManager.getPublicRooms());
+      }
     } else {
       callback({ success: false, message: 'Room already exists' });
     }
   });
 
   // === 방 입장 ===
-  socket.on('joinRoom', ({ roomName, nickname }, callback) => {
+  socket.on('joinRoom', ({ roomName, nickname, roomCode }, callback) => {
+    const room = roomManager.getRoom(roomName);
+    if (!room) {
+      return callback({ success: false, message: 'Room not found' });
+    }
+    
+    // 비공개방인 경우 코드 확인
+    if (room.options.isPrivate && room.options.roomCode !== roomCode) {
+      return callback({ success: false, message: 'Invalid room code' });
+    }
+    
     if (roomManager.joinRoom(roomName, { id: socket.id, nickname })) {
       socket.join(roomName);
-      callback({ success: true });
+      callback({ success: true, room: roomManager.getRoom(roomName) });
       io.to(roomName).emit('roomPlayers', roomManager.getRoomPlayers(roomName));
+    } else {
+      callback({ success: false, message: 'Join failed' });
+    }
+  });
+
+  // === 코드로 방 입장 ===
+  socket.on('joinRoomByCode', ({ roomCode, nickname }, callback) => {
+    const room = roomManager.findRoomByCode(roomCode);
+    if (!room) {
+      return callback({ success: false, message: 'Room not found' });
+    }
+    
+    if (roomManager.joinRoom(room.name, { id: socket.id, nickname })) {
+      socket.join(room.name);
+      callback({ success: true, room: roomManager.getRoom(room.name) });
+      io.to(room.name).emit('roomPlayers', roomManager.getRoomPlayers(room.name));
     } else {
       callback({ success: false, message: 'Join failed' });
     }

@@ -15,7 +15,9 @@
       "Bash(pkill:*)",
       "Bash(npm install:*)",
       "Bash(railway login:*)",
-      "Bash(npx @railway/cli:*)"
+      "Bash(npx @railway/cli:*)",
+      "Bash(firebase deploy:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": []
   }

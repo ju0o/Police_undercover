@@ -7,6 +7,7 @@ import './App.css';
 
 // 컴포넌트 imports
 import LoginScreen from './components/LoginScreen';
+import MainMenu from './components/MainMenu';
 import Lobby from './features/lobby/Lobby';
 import GameRoom from './features/game/GameRoom';
 import GameResults from './features/result/GameResults';
@@ -16,7 +17,7 @@ import SettingsModal from './components/SettingsModal';
 
 // 타입 정의
 interface GameState {
-  phase: 'login' | 'lobby' | 'room' | 'game' | 'meeting' | 'voting' | 'results' | 'loading';
+  phase: 'login' | 'menu' | 'lobby' | 'room' | 'game' | 'meeting' | 'voting' | 'results' | 'loading';
   error: string | null;
   isConnected: boolean;
 }
@@ -263,29 +264,39 @@ function App() {
       completedMissions: []
     });
     
-    // 연결 성공 후 로비로 이동
+    // 연결 성공 후 메인 메뉴로 이동
     setTimeout(() => {
       if (socket.connected) {
-        setGameState(prev => ({ ...prev, phase: 'lobby' }));
+        setGameState(prev => ({ ...prev, phase: 'menu' }));
       }
     }, 1000);
   };
 
-  // 방 생성
-  const handleCreateRoom = (roomName: string, options: any, password?: string) => {
+  // 방 생성 (새로운 시그니처)
+  const handleCreateRoom = (roomName: string, isPrivate: boolean) => {
     if (!socket || !playerData) return;
     
-    const roomOptions = password ? { ...options, password } : options;
+    const options = { isPrivate };
     
     socket.emit('createRoom', { 
       roomName, 
       nickname: playerData.nickname, 
-      options: roomOptions 
+      options 
     }, (response: any) => {
       if (response.success) {
         setRoomData(response.room);
         setGameState(prev => ({ ...prev, phase: 'room' }));
         setPlayerData(prev => prev ? { ...prev, isHost: true } : null);
+        
+        // 비공개방인 경우 방 코드 알림
+        if (isPrivate && response.roomCode) {
+          showNotification({
+            type: 'success',
+            title: '비공개방 생성 완료',
+            message: `방 코드: ${response.roomCode}`,
+            duration: 10000
+          });
+        }
       } else {
         setGameState(prev => ({ ...prev, error: response.message }));
       }
@@ -293,13 +304,29 @@ function App() {
   };
 
   // 방 입장
-  const handleJoinRoom = (roomName: string, password?: string) => {
+  const handleJoinRoom = (roomName: string) => {
     if (!socket || !playerData) return;
     
     socket.emit('joinRoom', { 
       roomName, 
-      nickname: playerData.nickname,
-      password 
+      nickname: playerData.nickname
+    }, (response: any) => {
+      if (response.success) {
+        setRoomData(response.room);
+        setGameState(prev => ({ ...prev, phase: 'room' }));
+      } else {
+        setGameState(prev => ({ ...prev, error: response.message }));
+      }
+    });
+  };
+
+  // 코드로 방 입장
+  const handleJoinByCode = (roomCode: string) => {
+    if (!socket || !playerData) return;
+    
+    socket.emit('joinRoomByCode', { 
+      roomCode, 
+      nickname: playerData.nickname
     }, (response: any) => {
       if (response.success) {
         setRoomData(response.room);
@@ -319,7 +346,7 @@ function App() {
     setMyMissions([]);
     setTeammates([]);
     setGameResults(null);
-    setGameState(prev => ({ ...prev, phase: 'lobby' }));
+    setGameState(prev => ({ ...prev, phase: 'menu' }));
     
     // 재연결
     setTimeout(() => {
@@ -357,14 +384,14 @@ function App() {
         <LoadingScreen message="서버에 연결 중..." />
       )}
       
-      {gameState.phase === 'lobby' && (
-        <Lobby
-          playerName={playerData?.nickname || ''}
-          rooms={availableRooms}
+      {gameState.phase === 'menu' && (
+        <MainMenu
+          nickname={playerData?.nickname || ''}
+          availableRooms={availableRooms}
           onCreateRoom={handleCreateRoom}
           onJoinRoom={handleJoinRoom}
+          onJoinByCode={handleJoinByCode}
           onLogout={handleLogout}
-          onOpenSettings={() => setShowSettings(true)}
         />
       )}
       
