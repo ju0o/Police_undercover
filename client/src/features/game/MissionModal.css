@@ -1,0 +1,659 @@
+/* [client/src/features/game/MissionModal.css] - 미션 모달 스타일 */
+/* 완전한 미니게임 UI를 위한 스타일 시스템 */
+
+/* ============================
+   미션 모달 기본 스타일
+   ============================ */
+
+.mission-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.mission-modal {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 20px;
+  padding: 0;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  border: 2px solid #4a90e2;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.mission-header {
+  background: linear-gradient(90deg, #4a90e2, #357abd);
+  color: white;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #2c5aa0;
+}
+
+.mission-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.mission-info {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.difficulty {
+  background: #ff6b6b;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.time-left {
+  background: #ffa726;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.mission-content {
+  padding: 30px;
+  color: white;
+}
+
+.mission-description {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+  color: #b8c5d6;
+  line-height: 1.5;
+}
+
+.mission-game {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================
+   순서 맞추기 미션 스타일
+   ============================ */
+
+.mission-display {
+  text-align: center;
+}
+
+.mission-display h3 {
+  color: #4a90e2;
+  margin-bottom: 30px;
+  font-size: 1.3rem;
+}
+
+.sequence-display {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.color-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  border: 3px solid white;
+  animation: colorPulse 0.5s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.color-box.red { background: #ff4757; }
+.color-box.blue { background: #3742fa; }
+.color-box.green { background: #2ed573; }
+.color-box.yellow { background: #ffa502; }
+
+@keyframes colorPulse {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mission-input h3 {
+  color: #4a90e2;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.color-button {
+  padding: 20px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.color-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.color-button:active {
+  transform: translateY(0);
+}
+
+.color-button.red { background: #ff4757; }
+.color-button.blue { background: #3742fa; }
+.color-button.green { background: #2ed573; }
+.color-button.yellow { background: #ffa502; }
+
+.progress {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #b8c5d6;
+  font-weight: bold;
+}
+
+/* ============================
+   진행률 미션 스타일
+   ============================ */
+
+.progress-mission {
+  text-align: center;
+  width: 100%;
+}
+
+.progress-mission h3 {
+  color: #4a90e2;
+  margin-bottom: 30px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 30px;
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a90e2, #357abd);
+  transition: width 0.3s ease;
+  border-radius: 18px;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.progress-button {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.progress-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.progress-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================
+   스위치 미션 스타일
+   ============================ */
+
+.switch-mission {
+  text-align: center;
+  width: 100%;
+}
+
+.switch-mission h3 {
+  color: #4a90e2;
+  margin-bottom: 30px;
+}
+
+.switches-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.switch-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.switch-label {
+  color: #b8c5d6;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.switch-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 80px;
+}
+
+.switch-button.on {
+  background: #2ed573;
+  color: white;
+}
+
+.switch-button.off {
+  background: #ff4757;
+  color: white;
+}
+
+.switch-button:hover {
+  transform: scale(1.05);
+}
+
+.target-hint {
+  background: rgba(74, 144, 226, 0.2);
+  padding: 15px;
+  border-radius: 12px;
+  color: #4a90e2;
+  font-size: 0.9rem;
+  border: 1px solid rgba(74, 144, 226, 0.3);
+}
+
+/* ============================
+   클릭 미션 스타일
+   ============================ */
+
+.click-mission {
+  text-align: center;
+  width: 100%;
+}
+
+.click-mission h3 {
+  color: #4a90e2;
+  margin-bottom: 30px;
+}
+
+.asteroid-field {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.asteroid {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, #ff6b6b, #ff4757);
+  border-radius: 50%;
+  cursor: pointer;
+  animation: asteroidFloat 2s ease-in-out infinite;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid #ff4757;
+}
+
+.asteroid:hover {
+  transform: scale(1.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes asteroidFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ============================
+   스와이프 미션 스타일
+   ============================ */
+
+.swipe-mission {
+  text-align: center;
+  width: 100%;
+}
+
+.swipe-mission h3 {
+  color: #4a90e2;
+  margin-bottom: 20px;
+}
+
+.swipe-instructions {
+  color: #b8c5d6;
+  margin-bottom: 30px;
+  font-size: 1rem;
+}
+
+.swipe-card {
+  width: 200px;
+  height: 120px;
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  border-radius: 15px;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swipe-card.swiping {
+  transform: scale(1.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+.card-content {
+  text-align: center;
+  color: white;
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.card-text {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* ============================
+   반응 속도 미션 스타일
+   ============================ */
+
+.reaction-mission {
+  text-align: center;
+  width: 100%;
+}
+
+.reaction-mission h3 {
+  color: #4a90e2;
+  margin-bottom: 30px;
+}
+
+.reaction-field {
+  width: 100%;
+  height: 300px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.reaction-target {
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, #ff4757, #ff3742);
+  border-radius: 50%;
+  cursor: pointer;
+  animation: targetPulse 0.5s ease-in-out;
+  box-shadow: 0 8px 16px rgba(255, 71, 87, 0.4);
+  border: 3px solid #ff3742;
+}
+
+.reaction-target:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 24px rgba(255, 71, 87, 0.6);
+}
+
+@keyframes targetPulse {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================
+   기억력 게임 스타일
+   ============================ */
+
+.memory-display {
+  text-align: center;
+}
+
+.memory-display h3 {
+  color: #4a90e2;
+  margin-bottom: 30px;
+}
+
+.number-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.display-number {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  animation: numberPulse 0.5s ease-in-out;
+  box-shadow: 0 8px 16px rgba(74, 144, 226, 0.4);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+@keyframes numberPulse {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.memory-input {
+  text-align: center;
+}
+
+.memory-input h3 {
+  color: #4a90e2;
+  margin-bottom: 30px;
+}
+
+.number-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.number-button {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.number-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================
+   반응형 디자인
+   ============================ */
+
+@media (max-width: 768px) {
+  .mission-modal {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .mission-header {
+    padding: 15px;
+  }
+  
+  .mission-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .mission-content {
+    padding: 20px;
+  }
+  
+  .color-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .color-button {
+    padding: 15px;
+    font-size: 0.9rem;
+  }
+  
+  .switches-container {
+    gap: 15px;
+  }
+  
+  .switch-item {
+    padding: 12px 15px;
+  }
+  
+  .asteroid-field {
+    height: 250px;
+  }
+  
+  .swipe-card {
+    width: 150px;
+    height: 90px;
+  }
+  
+  .reaction-field {
+    height: 250px;
+  }
+  
+  .reaction-target {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .number-grid {
+    gap: 15px;
+  }
+  
+  .number-button {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mission-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .color-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .number-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+} 

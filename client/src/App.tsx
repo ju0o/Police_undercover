@@ -1,14 +1,31 @@
-// [client/src/App.tsx] - 메인 애플리케이션 컴포넌트
-// 전체 게임 상태 관리 및 라우팅
+// [client/src/App.tsx] - 메인 애플리케이션 컴포넌트 (완전 개선된 버전)
+// 전체 게임 상태 관리, 타입 안전성, 완전한 이벤트 핸들링
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import './App.css';
+
+// 타입 imports
+import {
+  GameState,
+  PlayerData,
+  RoomData,
+  Settings,
+  Notification,
+  GameResults,
+  PublicRoom,
+  Role,
+  MissionProgress,
+  VotingUpdate,
+  MeetingData,
+  GamePhase,
+  SocketEventData,
+  SocketResponseData
+} from './types/game';
 
 // 컴포넌트 imports
 import LoginScreen from './components/LoginScreen';
 import MainMenu from './components/MainMenu';
-// import Lobby from './features/lobby/Lobby'; // 현재 사용하지 않음
 import GameRoom from './features/game/GameRoom';
 import GameResults from './features/result/GameResults';
 import LoadingScreen from './components/LoadingScreen';
@@ -16,42 +33,7 @@ import ErrorModal from './components/ErrorModal';
 import SettingsModal from './components/SettingsModal';
 import ControlsOverlay from './components/ControlsOverlay';
 
-// 타입 정의
-interface GameState {
-  phase: 'login' | 'menu' | 'lobby' | 'room' | 'game' | 'meeting' | 'voting' | 'results' | 'loading';
-  error: string | null;
-  isConnected: boolean;
-}
-
-interface PlayerData {
-  id: string;
-  nickname: string;
-  isHost: boolean;
-  isReady: boolean;
-  role: any;
-  position: { x: number; y: number };
-  isAlive: boolean;
-  completedMissions: any[];
-}
-
-interface RoomData {
-  name: string;
-  players: PlayerData[];
-  options: any;
-  gameState: string;
-}
-
-interface Settings {
-  soundEnabled: boolean;
-  musicEnabled: boolean;
-  volume: number;
-  graphics: 'low' | 'medium' | 'high';
-  showFPS: boolean;
-  colorBlindMode: boolean;
-  sound?: any;
-  controls?: any;
-}
-
+// 기본 설정값
 const DEFAULT_SETTINGS: Settings = {
   soundEnabled: true,
   musicEnabled: true,
@@ -62,6 +44,10 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 function App() {
+  // ============================
+  // 상태 관리
+  // ============================
+
   // 연결 및 게임 상태
   const [socket, setSocket] = useState<Socket | null>(null);
   const [gameState, setGameState] = useState<GameState>({
@@ -74,21 +60,42 @@ function App() {
   // 플레이어 및 방 데이터
   const [playerData, setPlayerData] = useState<PlayerData | null>(null);
   const [roomData, setRoomData] = useState<RoomData | null>(null);
-  const [availableRooms, setAvailableRooms] = useState<any[]>([]);
+  const [availableRooms, setAvailableRooms] = useState<PublicRoom[]>([]);
 
   // UI 상태
   const [showSettings, setShowSettings] = useState(false);
   const [showControlsOverlay, setShowControlsOverlay] = useState(false);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // 게임 데이터
-  const [gameResults, setGameResults] = useState<any>(null);
-  const [myMissions, setMyMissions] = useState<any[]>([]);
-  const [teammates, setTeammates] = useState<any[]>([]);
+  const [gameResults, setGameResults] = useState<GameResults | null>(null);
+  const [myMissions, setMyMissions] = useState<string[]>([]);
+  const [teammates, setTeammates] = useState<PlayerData[]>([]);
 
-  // 소켓 연결 초기화
+  // ============================
+  // 알림 시스템
+  // ============================
+
+  const showNotification = useCallback((notification: Omit<Notification, 'id'>) => {
+    const id = Date.now().toString();
+    const newNotification: Notification = { ...notification, id };
+    
+    setNotifications(prev => [...prev, newNotification]);
+    
+    if (notification.duration) {
+      setTimeout(() => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+      }, notification.duration);
+    }
+  }, []);
+
+  // ============================
+  // 소켓 연결 및 이벤트 핸들러
+  // ============================
+
   useEffect(() => {
+    // 저장된 설정 로드
     const savedSettings = localStorage.getItem('gameSettings');
     if (savedSettings) {
       try {
@@ -98,7 +105,7 @@ function App() {
       }
     }
 
-    // 개발 환경에서는 localhost, 프로덕션에서는 환경변수 사용
+    // 서버 URL 설정
     const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
     console.log('Connecting to server:', serverUrl);
     
@@ -108,27 +115,29 @@ function App() {
       reconnectionDelay: 2000,
       reconnectionAttempts: 10,
       timeout: 30000,
-      transports: ['polling'], // Railway에서 WebSocket 문제 시 polling만 사용
+      transports: ['polling'],
       upgrade: true,
-      forceNew: false, // Railway에서 false가 더 안정적
+      forceNew: false,
       rememberUpgrade: false
     });
 
     setSocket(newSocket);
 
-    // 연결 이벤트 리스너
+    // ============================
+    // 연결 관련 이벤트 핸들러
+    // ============================
+
     newSocket.on('connect', () => {
       console.log('Connected to server');
       setGameState(prev => ({ 
         ...prev, 
         isConnected: true, 
         error: null,
-        // 로딩 중이었다면 메뉴로 이동
         phase: prev.phase === 'loading' ? 'menu' : prev.phase
       }));
       
       // 연결되면 방 목록 요청
-      newSocket.emit('getRooms', (rooms: any[]) => {
+      newSocket.emit('getRooms', (rooms: PublicRoom[]) => {
         console.log('Rooms received:', rooms);
         setAvailableRooms(rooms || []);
       });
@@ -145,12 +154,6 @@ function App() {
 
     newSocket.on('connect_error', (error) => {
       console.error('Connection error:', error);
-      console.error('Error details:', {
-        message: error.message,
-        description: (error as any).description,
-        context: (error as any).context,
-        type: (error as any).type
-      });
       setGameState(prev => ({ 
         ...prev, 
         isConnected: false, 
@@ -158,22 +161,28 @@ function App() {
       }));
     });
 
-    // 방 목록 업데이트
-    newSocket.on('roomsUpdated', (rooms) => {
+    // ============================
+    // 방 관련 이벤트 핸들러
+    // ============================
+
+    newSocket.on('roomsUpdated', (rooms: PublicRoom[]) => {
       setAvailableRooms(rooms);
     });
 
-    // 방 상태 업데이트
-    newSocket.on('roomUpdated', (room) => {
+    newSocket.on('roomUpdated', (room: RoomData) => {
       setRoomData(room);
     });
 
-    // 게임 시작
-    newSocket.on('gameStarted', (data) => {
+    // ============================
+    // 게임 플레이 이벤트 핸들러
+    // ============================
+
+    newSocket.on('gameStarted', (data: { role: Role; teammates: PlayerData[]; missions: string[] }) => {
+      console.log('Game started:', data);
       setPlayerData(prev => prev ? { ...prev, role: data.role } : null);
       setMyMissions(data.missions);
       setTeammates(data.teammates);
-      setGameState(prev => ({ ...prev, phase: 'game' }));
+      setGameState(prev => ({ ...prev, phase: 'playing' }));
       
       showNotification({
         type: 'info',
@@ -183,43 +192,91 @@ function App() {
       });
     });
 
-    // 게임 페이즈 변경
-    newSocket.on('gamePhaseChanged', (data) => {
+    newSocket.on('gamePhaseChanged', (data: { phase: GamePhase }) => {
+      console.log('Game phase changed:', data.phase);
       setGameState(prev => ({ ...prev, phase: data.phase }));
     });
 
-    // 회의 시작
-    newSocket.on('meetingStarted', (data) => {
-      setGameState(prev => ({ ...prev, phase: 'meeting' }));
+    newSocket.on('playerKilled', (data: { victimId: string; victimNickname: string }) => {
+      console.log('Player killed:', data);
       showNotification({
         type: 'warning',
-        title: '긴급 회의!',
-        message: data.type === 'emergency_button' ? '긴급 버튼이 눌렸습니다!' : '시체가 발견되었습니다!',
+        title: '플레이어 사망',
+        message: `${data.victimNickname}님이 사망했습니다.`,
+        duration: 3000
+      });
+
+      // 내가 죽었다면 상태 업데이트
+      if (playerData && playerData.id === data.victimId) {
+        setPlayerData(prev => prev ? { ...prev, isAlive: false } : null);
+      }
+    });
+
+    newSocket.on('meetingStarted', (data: MeetingData) => {
+      console.log('Meeting started:', data);
+      setGameState(prev => ({ ...prev, phase: 'meeting' }));
+      
+      const message = data.type === 'emergency' 
+        ? `${data.calledBy}님이 긴급 회의를 소집했습니다!`
+        : `${data.reportedBy}님이 ${data.victim}님의 시체를 발견했습니다!`;
+        
+      showNotification({
+        type: 'warning',
+        title: '회의 시작!',
+        message,
         duration: 3000
       });
     });
 
-    // 투표 시작
     newSocket.on('votingStarted', () => {
+      console.log('Voting started');
       setGameState(prev => ({ ...prev, phase: 'voting' }));
+      showNotification({
+        type: 'info',
+        title: '투표 시작',
+        message: '의심스러운 플레이어에게 투표하세요!',
+        duration: 3000
+      });
     });
 
-    // 게임 종료
-    newSocket.on('gameEnded', (results) => {
+    newSocket.on('votingUpdate', (data: VotingUpdate) => {
+      console.log('Voting update:', data);
+      // 투표 현황 UI 업데이트는 GameRoom 컴포넌트에서 처리
+    });
+
+    newSocket.on('gameEnded', (results: GameResults) => {
+      console.log('Game ended:', results);
       setGameResults(results);
       setGameState(prev => ({ ...prev, phase: 'results' }));
+      
+      const isWinner = (playerData?.role?.team === results.winner);
+      showNotification({
+        type: isWinner ? 'success' : 'info',
+        title: '게임 종료',
+        message: `${results.winner === 'crewmate' ? '크루메이트' : '임포스터'} 승리!`,
+        duration: 5000
+      });
     });
 
-    // 방 리셋
+    newSocket.on('missionProgress', (data: MissionProgress) => {
+      console.log('Mission progress:', data);
+      showNotification({
+        type: 'success',
+        title: '미션 완료',
+        message: `미션 진행도: ${data.completed}/${data.total}`,
+        duration: 2000
+      });
+    });
+
     newSocket.on('roomReset', () => {
-      setGameState(prev => ({ ...prev, phase: 'room' }));
+      console.log('Room reset');
+      setGameState(prev => ({ ...prev, phase: 'lobby' }));
       setMyMissions([]);
       setTeammates([]);
       setGameResults(null);
     });
 
-    // 플레이어 연결 해제
-    newSocket.on('playerDisconnected', (data) => {
+    newSocket.on('playerDisconnected', (data: { playerName: string }) => {
       showNotification({
         type: 'info',
         title: '플레이어 퇴장',
@@ -228,8 +285,7 @@ function App() {
       });
     });
 
-    // 방장 변경
-    newSocket.on('hostChanged', (data) => {
+    newSocket.on('hostChanged', (data: { newHostName: string; newHostId: string }) => {
       showNotification({
         type: 'info',
         title: '방장 변경',
@@ -242,37 +298,25 @@ function App() {
       }
     });
 
-    // 에러 처리
-    newSocket.on('error', (error) => {
+    newSocket.on('error', (error: { message: string }) => {
       setGameState(prev => ({ ...prev, error: error.message || 'Unknown error' }));
     });
 
     return () => {
       newSocket.close();
     };
-  }, []);
+  }, [showNotification, playerData]);
 
   // 설정 저장
   useEffect(() => {
     localStorage.setItem('gameSettings', JSON.stringify(settings));
   }, [settings]);
 
-  // 알림 표시 함수
-  const showNotification = (notification: any) => {
-    const id = Date.now().toString();
-    const newNotification = { ...notification, id };
-    
-    setNotifications(prev => [...prev, newNotification]);
-    
-    if (notification.duration) {
-      setTimeout(() => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
-      }, notification.duration);
-    }
-  };
+  // ============================
+  // 게임 액션 핸들러
+  // ============================
 
-  // 로그인 처리
-  const handleLogin = (nickname: string) => {
+  const handleLogin = useCallback((nickname: string) => {
     if (!socket) return;
     
     setGameState(prev => ({ ...prev, phase: 'loading' }));
@@ -288,25 +332,25 @@ function App() {
       completedMissions: []
     });
     
-    // 연결 시도 표시
     setConnectionAttempted(true);
-    
-    // 소켓 연결 시작
     socket.connect();
     
-    // 연결 타임아웃 후 강제로 메인 메뉴로 이동 (fallback)
+    // 연결 타임아웃 후 메뉴로 이동
     setTimeout(() => {
       if (socket.connected) {
         setGameState(prev => ({ ...prev, phase: 'menu' }));
       } else {
         console.warn('Socket connection failed, proceeding to menu anyway');
-        setGameState(prev => ({ ...prev, phase: 'menu', error: 'Connection unstable - some features may not work' }));
+        setGameState(prev => ({ 
+          ...prev, 
+          phase: 'menu', 
+          error: 'Connection unstable - some features may not work' 
+        }));
       }
     }, 3000);
-  };
+  }, [socket]);
 
-  // 방 생성 (새로운 시그니처)
-  const handleCreateRoom = (roomName: string, isPrivate: boolean) => {
+  const handleCreateRoom = useCallback((roomName: string, isPrivate: boolean) => {
     if (!socket || !playerData) {
       setGameState(prev => ({ ...prev, error: 'Connection not established. Please try again.' }));
       return;
@@ -317,19 +361,18 @@ function App() {
       return;
     }
     
-    const options = { isPrivate };
-    
-    socket.emit('createRoom', { 
+    const data: SocketEventData['createRoom'] = { 
       roomName, 
       nickname: playerData.nickname, 
-      options 
-    }, (response: any) => {
+      options: { isPrivate } 
+    };
+    
+    socket.emit('createRoom', data, (response: SocketResponseData) => {
       if (response && response.success) {
-        setRoomData(response.room);
-        setGameState(prev => ({ ...prev, phase: 'room' }));
+        setRoomData(response.room!);
+        setGameState(prev => ({ ...prev, phase: 'lobby' }));
         setPlayerData(prev => prev ? { ...prev, isHost: true } : null);
         
-        // 비공개방인 경우 방 코드 알림
         if (isPrivate && response.roomCode) {
           showNotification({
             type: 'success',
@@ -342,44 +385,45 @@ function App() {
         setGameState(prev => ({ ...prev, error: response?.message || 'Failed to create room' }));
       }
     });
-  };
+  }, [socket, playerData, showNotification]);
 
-  // 방 입장
-  const handleJoinRoom = (roomName: string) => {
+  const handleJoinRoom = useCallback((roomName: string) => {
     if (!socket || !playerData) return;
     
-    socket.emit('joinRoom', { 
+    const data: SocketEventData['joinRoom'] = { 
       roomName, 
       nickname: playerData.nickname
-    }, (response: any) => {
+    };
+    
+    socket.emit('joinRoom', data, (response: SocketResponseData) => {
       if (response.success) {
-        setRoomData(response.room);
-        setGameState(prev => ({ ...prev, phase: 'room' }));
+        setRoomData(response.room!);
+        setGameState(prev => ({ ...prev, phase: 'lobby' }));
       } else {
-        setGameState(prev => ({ ...prev, error: response.message }));
+        setGameState(prev => ({ ...prev, error: response.message || 'Failed to join room' }));
       }
     });
-  };
+  }, [socket, playerData]);
 
-  // 코드로 방 입장
-  const handleJoinByCode = (roomCode: string) => {
+  const handleJoinByCode = useCallback((roomCode: string) => {
     if (!socket || !playerData) return;
     
-    socket.emit('joinRoomByCode', { 
+    const data: SocketEventData['joinRoomByCode'] = { 
       roomCode, 
       nickname: playerData.nickname
-    }, (response: any) => {
+    };
+    
+    socket.emit('joinRoomByCode', data, (response: SocketResponseData) => {
       if (response.success) {
-        setRoomData(response.room);
-        setGameState(prev => ({ ...prev, phase: 'room' }));
+        setRoomData(response.room!);
+        setGameState(prev => ({ ...prev, phase: 'lobby' }));
       } else {
-        setGameState(prev => ({ ...prev, error: response.message }));
+        setGameState(prev => ({ ...prev, error: response.message || 'Failed to join room' }));
       }
     });
-  };
+  }, [socket, playerData]);
 
-  // 방 나가기
-  const handleLeaveRoom = () => {
+  const handleLeaveRoom = useCallback(() => {
     if (!socket) return;
     
     socket.disconnect();
@@ -393,15 +437,13 @@ function App() {
     setTimeout(() => {
       socket.connect();
     }, 500);
-  };
+  }, [socket]);
 
-  // 에러 처리
-  const handleErrorClose = () => {
+  const handleErrorClose = useCallback(() => {
     setGameState(prev => ({ ...prev, error: null }));
-  };
+  }, []);
 
-  // 로그아웃
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     if (socket) {
       socket.disconnect();
     }
@@ -410,10 +452,14 @@ function App() {
     setMyMissions([]);
     setTeammates([]);
     setGameResults(null);
+    setConnectionAttempted(false);
     setGameState({ phase: 'login', error: null, isConnected: false });
-  };
+  }, [socket]);
 
+  // ============================
   // 렌더링
+  // ============================
+
   return (
     <div className="app">
       {/* 메인 콘텐츠 */}
@@ -436,7 +482,7 @@ function App() {
         />
       )}
       
-      {(gameState.phase === 'room' || gameState.phase === 'game' || 
+      {(gameState.phase === 'lobby' || gameState.phase === 'playing' || 
         gameState.phase === 'meeting' || gameState.phase === 'voting') && roomData && (
         <GameRoom
           socket={socket}
@@ -454,7 +500,7 @@ function App() {
         <GameResults
           results={gameResults}
           playerData={playerData}
-          onPlayAgain={() => setGameState(prev => ({ ...prev, phase: 'room' }))}
+          onPlayAgain={() => setGameState(prev => ({ ...prev, phase: 'lobby' }))}
           onBackToLobby={handleLeaveRoom}
         />
       )}
@@ -471,8 +517,8 @@ function App() {
       {showSettings && (
         <SettingsModal
           isOpen={true}
-          settings={settings as any}
-          onSettingsChange={setSettings as any}
+          settings={settings}
+          onSettingsChange={setSettings}
           onClose={() => setShowSettings(false)}
         />
       )}
@@ -496,14 +542,15 @@ function App() {
         ))}
       </div>
 
-      {/* 작동법 오버레이 */}
+      {/* 조작법 오버레이 */}
       <ControlsOverlay 
         isVisible={showControlsOverlay}
         onToggle={() => setShowControlsOverlay(prev => !prev)}
       />
 
-      {/* 연결 상태 표시 (연결 시도 후 && 게임 중이 아닐 때만) */}
-      {connectionAttempted && gameState.phase !== 'game' && gameState.phase !== 'meeting' && gameState.phase !== 'voting' && (
+      {/* 연결 상태 표시 */}
+      {connectionAttempted && gameState.phase !== 'playing' && 
+       gameState.phase !== 'meeting' && gameState.phase !== 'voting' && (
         <div className={`connection-status ${gameState.isConnected ? 'connected' : 'disconnected'}`}>
           <div className="status-indicator"></div>
           <span>{gameState.isConnected ? '연결됨' : '연결 불안정'}</span>

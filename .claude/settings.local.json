@@ -18,7 +18,9 @@
       "Bash(npx @railway/cli:*)",
       "Bash(firebase deploy:*)",
       "Bash(git fetch:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npm run lint)"
     ],
     "deny": []
   }
