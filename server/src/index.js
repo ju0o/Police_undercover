@@ -6,7 +6,7 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const roomManager = require('./rooms/roomManager');
 const roleManager = require('./roles/roleManager');
-const moveManager = require('./game/moveManager'); // 위치 동기화 모듈
+const moveManager = require('./game/moveManager');
 
 const app = express();
 app.use(cors());
@@ -44,18 +44,10 @@ io.on('connection', (socket) => {
   });
 
   // === 게임 시작/역할 배정/초기 위치 ===
-socket.on('startGame', ({ roomName }, callback) => {
-  const players = roomManager.getRoomPlayers(roomName);
-  const options = roomManager.getRoomOptions(roomName);
-  const missions = missionManager.getMissions();
-  const missionsPerPlayer = options.missionsPerPlayer || 5;
-  // === 각 유저에게 미션 랜덤 배정 ===
-  const playerMissions = {};
-  players.forEach((p) => {
-    // 미션 n개 랜덤 뽑기 (중복 허용 X)
-    const shuffled = missions.slice().sort(() => Math.random() - 0.5);
-    playerMissions[p.id] = shuffled.slice(0, missionsPerPlayer);
-  });
+  socket.on('startGame', ({ roomName }, callback) => {
+    const players = roomManager.getRoomPlayers(roomName);
+    const options = roomManager.getRoomOptions(roomName);
+    // 게임 시작 로직은 나중에 구현
     io.to(roomName).emit('gameStarted');
     io.to(roomName).emit('positionsUpdate', moveManager.getAllPositions(roomName));
     callback({ success: true });
@@ -85,15 +77,4 @@ socket.on('startGame', ({ roomName }, callback) => {
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
-});
-
-socket.on('createRoom', ({ roomName, nickname, options }, callback) => {
-    if (roomManager.createRoom(roomName, options)) {
-      roomManager.joinRoom(roomName, { id: socket.id, nickname });
-      socket.join(roomName);
-      callback({ success: true });
-      io.emit('roomsUpdated', roomManager.getAllRooms());
-    } else {
-      callback({ success: false, message: 'Room already exists' });
-    }
 });
