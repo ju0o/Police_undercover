@@ -36,22 +36,26 @@ function createRoom(roomName, customOptions = {}) {
   try {
     // 방 이름 유효성 검사
     if (!roomName || typeof roomName !== 'string' || roomName.trim().length === 0) {
+      console.log(`[CREATE ROOM] Invalid room name: ${roomName}`);
       return false;
     }
 
     // 방 이름 길이 제한 (최대 20자)
     if (roomName.length > 20) {
+      console.log(`[CREATE ROOM] Room name too long: ${roomName}`);
       return false;
     }
 
     // 특수문자 제한 (영문, 숫자, 한글, 공백만 허용)
     const validNameRegex = /^[a-zA-Z0-9가-힣\s]+$/;
     if (!validNameRegex.test(roomName)) {
+      console.log(`[CREATE ROOM] Room name contains invalid characters: ${roomName}`);
       return false;
     }
 
     // 이미 존재하는 방인지 확인
     if (rooms.has(roomName)) {
+      console.log(`[CREATE ROOM] Room already exists: ${roomName}`);
       return false;
     }
 
@@ -72,7 +76,13 @@ function createRoom(roomName, customOptions = {}) {
     };
 
     rooms.set(roomName, room);
-    console.log(`[${new Date().toISOString()}] Room created: ${roomName}`);
+    console.log(`[${new Date().toISOString()}] Room created: ${roomName} with ${Object.keys(customOptions).length} custom options`);
+    console.log(`[CREATE ROOM] Room details:`, {
+      name: roomName,
+      options: roomOptions,
+      playerCount: room.players.length,
+      isPrivate: roomOptions.isPrivate
+    });
     return true;
 
   } catch (error) {
@@ -473,11 +483,18 @@ function getPublicRooms() {
   const publicRooms = [];
   for (const [roomName, room] of rooms) {
     if (!room.options.isPrivate) {
+      const host = room.players.find(p => p.isHost);
       publicRooms.push({
         name: roomName,
         playerCount: room.players.length,
         maxPlayers: room.options.maxPlayers,
-        gameStarted: room.gameStarted || false
+        gameState: room.gameState || 'waiting',
+        hasPassword: !!room.options.password,
+        hostName: host ? host.nickname : 'Unknown',
+        createdAt: room.createdAt,
+        gameMode: room.options.gameMode || 'classic',
+        map: room.options.map || 'spaceship',
+        options: room.options
       });
     }
   }

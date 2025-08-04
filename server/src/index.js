@@ -72,23 +72,107 @@ io.on('connection', (socket) => {
 
   // 방 목록 요청
   socket.on('getRooms', (callback) => {
-    const publicRooms = roomManager.getPublicRooms();
-    if (typeof callback === 'function') {
-      callback(publicRooms);
+    try {
+      // 빈 방들을 먼저 정리
+      const allRooms = roomManager.getAllRooms();
+      const roomsToCleanup = [];
+      
+      for (const [roomName, room] of allRooms) {
+        // 플레이어가 없거나 오래된 빈 방 정리
+        if (room.players.length === 0 || 
+            (room.players.length === 0 && Date.now() - room.lastActivity > 300000)) { // 5분
+          roomsToCleanup.push(roomName);
+        }
+      }
+      
+      // 빈 방들 삭제
+      for (const roomName of roomsToCleanup) {
+        console.log(`[CLEANUP] Removing empty/inactive room: ${roomName}`);
+        roomManager.deleteRoom(roomName);
+        gameStateManager.deleteGame(roomName);
+      }
+      
+      const publicRooms = roomManager.getPublicRooms();
+      console.log(`[ROOMS] Returning ${publicRooms.length} public rooms`);
+      
+      if (typeof callback === 'function') {
+        callback(publicRooms);
+      }
+    } catch (error) {
+      console.error('[ROOMS] Error getting rooms:', error);
+      if (typeof callback === 'function') {
+        callback([]);
+      }
     }
   });
 
   // 방 생성
   socket.on('createRoom', ({ roomName, nickname, options = {} }, callback) => {
     console.log(`[CREATE ROOM] Attempting to create room: ${roomName} by ${nickname}`);
+    console.log(`[CREATE ROOM] Options:`, options);
+    
+    // 입력 검증
+    if (!roomName || typeof roomName !== 'string' || roomName.trim().length === 0) {
+      return callback({ success: false, message: '방 이름을 입력해주세요.' });
+    }
+    
+    if (roomName.length > 20) {
+      return callback({ success: false, message: '방 이름은 20글자 이하로 입력해주세요.' });
+    }
+    
+    // 특수문자 제한 (영문, 숫자, 한글, 공백만 허용)
+    const validNameRegex = /^[a-zA-Z0-9가-힣\s]+$/;
+    if (!validNameRegex.test(roomName)) {
+      return callback({ success: false, message: '방 이름에는 영문, 숫자, 한글, 공백만 사용 가능합니다.' });
+    }
+    
+    if (!nickname || typeof nickname !== 'string' || nickname.trim().length === 0) {
+      return callback({ success: false, message: '닉네임을 입력해주세요.' });
+    }
     
     // 먼저 기존 빈 방들을 정리
     const allRooms = roomManager.getAllRooms();
+    const roomsToCleanup = [];
+    
     for (const [existingRoomName, room] of allRooms) {
-      if (room.players.length === 0) {
-        console.log(`[CLEANUP] Removing empty room: ${existingRoomName}`);
-        roomManager.deleteRoom(existingRoomName);
-        gameStateManager.deleteGame(existingRoomName);
+      // 플레이어가 없거나 오래된 빈 방 정리
+      if (room.players.length === 0 || 
+          (room.players.length === 0 && Date.now() - room.lastActivity > 300000)) { // 5분
+        roomsToCleanup.push(existingRoomName);
+      }
+    }
+    
+    // 빈 방들 삭제
+    for (const roomNameToClean of roomsToCleanup) {
+      console.log(`[CLEANUP] Removing empty room: ${roomNameToClean}`);
+      roomManager.deleteRoom(roomNameToClean);
+      gameStateManager.deleteGame(roomNameToClean);
+    }
+    
+    // 게임 모드 설정 처리
+    if (options.gameMode) {
+      console.log(`[GAME MODE] Setting up ${options.gameMode} mode`);
+      
+      // 게임 모드별 기본 설정 적용
+      switch (options.gameMode) {
+        case 'classic':
+          options.impostorCount = options.impostorCount || 1;
+          options.crewCount = options.crewCount || 7;
+          options.selectedMissions = options.selectedMissions || ['electrical_wires', 'fuel_engine', 'fix_lights', 'clear_asteroids', 'swipe_card'];
+          break;
+        case 'detective':
+          options.impostorCount = options.impostorCount || 2;
+          options.crewCount = options.crewCount || 8;
+          options.selectedMissions = options.selectedMissions || ['electrical_wires', 'fuel_engine', 'fix_lights', 'clear_asteroids', 'swipe_card', 'security_code', 'reaction_test'];
+          break;
+        case 'undercover':
+          options.impostorCount = options.impostorCount || 3;
+          options.crewCount = options.crewCount || 9;
+          options.selectedMissions = options.selectedMissions || ['electrical_wires', 'fuel_engine', 'fix_lights', 'clear_asteroids', 'swipe_card', 'security_code', 'reaction_test', 'memory_game'];
+          break;
+        case 'custom':
+          // 커스텀 모드는 사용자가 설정한 값 사용
+          break;
       }
     }
     

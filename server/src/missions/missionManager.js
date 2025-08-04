@@ -242,7 +242,7 @@ function startMission(roomName, playerId, missionId) {
   roomProgress.set(playerId, playerProgress);
   
   console.log(`[MISSION] Mission started: ${missionId} for player: ${playerId}`);
-  return {
+    return {
     ...missionData,
     state: missionState
   };
@@ -285,9 +285,9 @@ function completeMission(roomName, playerId, missionId) {
   
   if (!mission.completed) {
     console.error(`[MISSION] Mission not completed: ${missionId}`);
-    return false;
-  }
-  
+      return false;
+    }
+
   // 완료된 미션 제거
   delete playerProgress[missionId];
   
