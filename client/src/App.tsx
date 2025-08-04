@@ -99,12 +99,15 @@ function App() {
 
     // 개발 환경에서는 localhost, 프로덕션에서는 환경변수 사용
     const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+    console.log('Connecting to server:', serverUrl);
+    
     const newSocket = io(serverUrl, {
       autoConnect: false,
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
-      timeout: 20000
+      timeout: 20000,
+      transports: ['websocket', 'polling']
     });
 
     setSocket(newSocket);

@@ -1,7 +1,7 @@
 // [client/src/components/ControlsOverlay.tsx] - 작동법 오버레이 컴포넌트
 // H키로 표시/숨김 가능한 반투명 오버레이
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import './ControlsOverlay.css';
 
 interface ControlsOverlayProps {
