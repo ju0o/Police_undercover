@@ -12,7 +12,7 @@ interface ControlsOverlayProps {
 const ControlsOverlay: React.FC<ControlsOverlayProps> = ({ isVisible, onToggle }) => {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === 'h') {
+      if (event.key && event.key.toLowerCase() === 'h') {
         onToggle();
       }
     };

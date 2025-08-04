@@ -74,6 +74,17 @@ io.on('connection', (socket) => {
 
   // === 방 생성 ===
   socket.on('createRoom', ({ roomName, nickname, options = {} }, callback) => {
+    console.log(`[CREATE ROOM] Attempting to create room: ${roomName} by ${nickname}`);
+    
+    // 먼저 기존 빈 방들을 정리
+    const allRooms = roomManager.getAllRooms();
+    for (const [existingRoomName, room] of allRooms) {
+      if (room.players.length === 0) {
+        console.log(`[CLEANUP] Removing empty room: ${existingRoomName}`);
+        roomManager.deleteRoom(existingRoomName);
+      }
+    }
+    
     // 비공개방인 경우 랜덤 코드 생성
     if (options.isPrivate) {
       options.roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -83,6 +94,7 @@ io.on('connection', (socket) => {
       const player = { id: socket.id, nickname, isHost: true };
       roomManager.joinRoom(roomName, player);
       socket.join(roomName);
+      console.log(`[CREATE ROOM] Successfully created room: ${roomName}`);
       callback({ 
         success: true, 
         room: roomManager.getRoom(roomName),
@@ -94,7 +106,8 @@ io.on('connection', (socket) => {
         io.emit('roomsUpdated', roomManager.getPublicRooms());
       }
     } else {
-      callback({ success: false, message: 'Room already exists' });
+      console.log(`[CREATE ROOM] Failed to create room: ${roomName} - already exists`);
+      callback({ success: false, message: '이미 존재하는 방이거나 방 이름이 유효하지 않습니다.' });
     }
   });
 
@@ -158,17 +171,30 @@ io.on('connection', (socket) => {
     try {
       // 모든 룸에서 플레이어 제거
       const allRooms = roomManager.getAllRooms();
-      for (const roomName of allRooms) {
-        moveManager.removePlayer(roomName, socket.id);
-        roomManager.leaveRoom(roomName, socket.id);
-        
-        // 룸이 비어있다면 정리
-        const remainingPlayers = roomManager.getRoomPlayers(roomName);
-        if (remainingPlayers.length === 0) {
-          roomManager.deleteRoom(roomName);
-        } else {
-          io.to(roomName).emit('roomPlayers', remainingPlayers);
+      const roomsToCleanup = [];
+      
+      for (const [roomName, room] of allRooms) {
+        // 해당 플레이어가 이 방에 있는지 확인
+        const playerInRoom = room.players.find(p => p.id === socket.id);
+        if (playerInRoom) {
+          console.log(`[DISCONNECT] Removing player ${socket.id} from room: ${roomName}`);
+          moveManager.removePlayer(roomName, socket.id);
+          roomManager.leaveRoom(roomName, socket.id);
+          
+          // 룸이 비어있다면 즉시 삭제 목록에 추가
+          const remainingPlayers = roomManager.getRoomPlayers(roomName);
+          if (remainingPlayers.length === 0) {
+            roomsToCleanup.push(roomName);
+          } else {
+            io.to(roomName).emit('roomPlayers', remainingPlayers);
+          }
         }
+      }
+      
+      // 빈 방들을 즉시 정리
+      for (const roomName of roomsToCleanup) {
+        console.log(`[DISCONNECT] Deleting empty room: ${roomName}`);
+        roomManager.deleteRoom(roomName);
       }
       
       // 공개방 목록 업데이트

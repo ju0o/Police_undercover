@@ -17,7 +17,8 @@
       "Bash(railway login:*)",
       "Bash(npx @railway/cli:*)",
       "Bash(firebase deploy:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }
