@@ -56,7 +56,7 @@ const io = new Server(server, {
     allowedHeaders: ["*"]
   },
   allowEIO3: true,
-  transports: ['websocket', 'polling'], // websocket 우선 지원
+  transports: ['polling'], // WebSocket 제거 - Polling만 사용
   pingTimeout: 60000,
   pingInterval: 25000,
   upgradeTimeout: 30000,
