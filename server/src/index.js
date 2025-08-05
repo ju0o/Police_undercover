@@ -52,18 +52,22 @@ const io = new Server(server, {
   cors: {
     origin: "*", // 모든 도메인 허용 - 연결 문제 해결
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: false, // Render에서는 false로 설정
+    credentials: false,
     allowedHeaders: ["*"]
   },
   allowEIO3: true,
-  transports: ['polling', 'websocket'],
-  pingTimeout: 60000, // 더 긴 타임아웃
+  transports: ['websocket', 'polling'], // websocket 우선 지원
+  pingTimeout: 60000,
   pingInterval: 25000,
-  upgradeTimeout: 30000, // 더 긴 업그레이드 타임아웃
-  maxHttpBufferSize: 1e6, // 1MB로 증가
-  connectTimeout: 45000, // 더 긴 연결 타임아웃
-  serveClient: true, // Render에서는 true로 설정
-  path: '/socket.io/' // 명시적 경로 설정
+  upgradeTimeout: 30000,
+  maxHttpBufferSize: 1e6,
+  connectTimeout: 60000, // 연결 타임아웃 증가
+  serveClient: true,
+  path: '/socket.io/', // 명시적 경로 설정
+  // 추가 안정성 설정
+  cookie: false, // 쿠키 비활성화로 CORS 문제 방지
+  destroyUpgrade: false,
+  destroyUpgradeTimeout: 1000
 });
 
 io.on('connection', (socket) => {
