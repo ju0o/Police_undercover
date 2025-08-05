@@ -61,7 +61,7 @@ const io = new Server(server, {
     allowedHeaders: ["*"]
   },
   allowEIO3: true,
-  transports: ['websocket', 'polling'], // WebSocket 우선 지원 (Render 지원)
+  transports: ['polling'], // WebSocket 문제로 Polling만 사용
   pingTimeout: 60000,
   pingInterval: 25000,
   upgradeTimeout: 30000,

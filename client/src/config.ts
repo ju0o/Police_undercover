@@ -10,8 +10,8 @@ export const SOCKET_CONFIG = {
   reconnection: true,
   reconnectionDelay: 1000,
   reconnectionAttempts: 15,
-  timeout: 30000,
-  transports: ['websocket', 'polling'], // WebSocket 우선 시도 (Render 지원함)
+  timeout: 60000, // 60초로 증가
+  transports: ['polling'], // WebSocket 문제로 Polling만 사용
   upgrade: true,
   forceNew: false,
   rememberUpgrade: false,
