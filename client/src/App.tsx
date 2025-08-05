@@ -1,7 +1,7 @@
 // [client/src/App.tsx] - 메인 애플리케이션 컴포넌트 (완전 개선된 버전)
 // 전체 게임 상태 관리, 타입 안전성, 완전한 이벤트 핸들링
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import './App.css';
 import { SERVER_URL, SOCKET_CONFIG } from './config';
@@ -51,6 +51,7 @@ function App() {
 
   // 연결 및 게임 상태
   const [socket, setSocket] = useState<Socket | null>(null);
+  const socketRef = useRef<Socket | null>(null); // useRef로 소켓 관리
   const [gameState, setGameState] = useState<GameState>({
     phase: 'login',
     error: null,
@@ -110,8 +111,11 @@ function App() {
     console.log('Connecting to server:', SERVER_URL);
     console.log('Socket config:', SOCKET_CONFIG);
     
-    const newSocket = io(SERVER_URL, SOCKET_CONFIG);
-
+    // addTrailingSlash: false 적용
+    const mergedConfig = { ...SOCKET_CONFIG, addTrailingSlash: false };
+    const newSocket = io(SERVER_URL, mergedConfig);
+    
+    socketRef.current = newSocket; // useRef에 저장
     setSocket(newSocket);
     
     // autoConnect: false이므로 수동 연결 시작
@@ -310,9 +314,18 @@ function App() {
     });
 
     return () => {
-      newSocket.close();
+      // 모든 리스너 해제
+      newSocket.off();
+      
+      // 소켓 연결 해제
+      if (newSocket.connected) {
+        newSocket.disconnect();
+      }
+      
+      // useRef 정리
+      socketRef.current = null;
     };
-  }, [showNotification, playerData]);
+  }, []); // 의존성 배열 비워서 한 번만 실행
 
   // 설정 저장
   useEffect(() => {

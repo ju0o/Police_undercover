@@ -11,13 +11,14 @@ export const SOCKET_CONFIG = {
   reconnectionDelay: 1000,
   reconnectionAttempts: 15,
   timeout: 30000,
-  transports: ['polling'], // WebSocket 제거 - Polling만 사용
-  upgrade: false, // 업그레이드 비활성화
+  transports: ['websocket', 'polling'], // WebSocket 우선 시도 (Render 지원함)
+  upgrade: true,
   forceNew: false,
   rememberUpgrade: false,
   withCredentials: false,
-  path: '/socket.io/',
+  path: '/socket.io', // 트레일링 슬래시 제거
   secure: true,
   rejectUnauthorized: false,
-  closeOnBeforeunload: false
+  closeOnBeforeunload: false,
+  addTrailingSlash: false // 트레일링 슬래시 방지
 }; 

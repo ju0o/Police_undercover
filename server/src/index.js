@@ -47,24 +47,28 @@ app.get('/health', (req, res) => {
 
 const server = http.createServer(app);
 
-// Socket.IO 서버 생성 - Render 최적화 설정
+// Socket.IO 서버 생성 - Render WebSocket 지원 설정
 const io = new Server(server, {
   cors: {
-    origin: "*", // 모든 도메인 허용 - 연결 문제 해결
+    origin: [
+      "https://metacraze-c393c.web.app",
+      "https://metacraze-c393c.firebaseapp.com", 
+      "http://localhost:5173",
+      "http://localhost:3000"
+    ], // 엄격한 CORS 정책으로 복원
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: false,
     allowedHeaders: ["*"]
   },
   allowEIO3: true,
-  transports: ['polling'], // WebSocket 제거 - Polling만 사용
+  transports: ['websocket', 'polling'], // WebSocket 우선 지원 (Render 지원)
   pingTimeout: 60000,
   pingInterval: 25000,
   upgradeTimeout: 30000,
   maxHttpBufferSize: 1e6,
-  connectTimeout: 60000, // 연결 타임아웃 증가
+  connectTimeout: 60000,
   serveClient: true,
-  path: '/socket.io/', // 명시적 경로 설정
-  // 추가 안정성 설정
+  path: '/socket.io', // 트레일링 슬래시 제거
   cookie: false, // 쿠키 비활성화로 CORS 문제 방지
   destroyUpgrade: false,
   destroyUpgradeTimeout: 1000
