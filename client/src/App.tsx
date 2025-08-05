@@ -113,6 +113,9 @@ function App() {
     const newSocket = io(SERVER_URL, SOCKET_CONFIG);
 
     setSocket(newSocket);
+    
+    // autoConnect: false이므로 수동 연결 시작
+    newSocket.connect();
 
     // ============================
     // 연결 관련 이벤트 핸들러
@@ -354,7 +357,7 @@ function App() {
     }, 10000); // 10초로 증가
   }, [socket]);
 
-  const handleCreateRoom = useCallback((roomName: string, isPrivate: boolean) => {
+  const handleCreateRoom = useCallback((roomName: string, options: any) => {
     if (!socket || !playerData) {
       setGameState(prev => ({ ...prev, error: 'Connection not established. Please try again.' }));
       return;
@@ -368,7 +371,7 @@ function App() {
     const data: SocketEventData['createRoom'] = { 
       roomName, 
       nickname: playerData.nickname, 
-      options: { isPrivate } 
+      options 
     };
     
     socket.emit('createRoom', data, (response: SocketResponseData) => {
@@ -377,7 +380,7 @@ function App() {
         setGameState(prev => ({ ...prev, phase: 'lobby' }));
         setPlayerData(prev => prev ? { ...prev, isHost: true } : null);
         
-        if (isPrivate && response.roomCode) {
+        if (options.isPrivate && response.roomCode) {
           showNotification({
             type: 'success',
             title: '비공개방 생성 완료',
@@ -428,19 +431,18 @@ function App() {
   }, [socket, playerData]);
 
   const handleLeaveRoom = useCallback(() => {
-    if (!socket) return;
+    if (!socket || !roomData) return;
     
-    socket.disconnect();
+    // 서버에 방 퇴장 알림
+    socket.emit('leaveRoom', { roomName: roomData.name });
+    
     setRoomData(null);
     setMyMissions([]);
     setGameResults(null);
     setGameState(prev => ({ ...prev, phase: 'menu' }));
     
-    // 재연결
-    setTimeout(() => {
-      socket.connect();
-    }, 500);
-  }, [socket]);
+    // 재연결하지 않고 연결 유지
+  }, [socket, roomData]);
 
   const handleErrorClose = useCallback(() => {
     setGameState(prev => ({ ...prev, error: null }));

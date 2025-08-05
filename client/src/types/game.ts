@@ -374,7 +374,7 @@ export interface GameRoomProps {
 export interface MainMenuProps {
   nickname: string;
   availableRooms: PublicRoom[];
-  onCreateRoom: (roomName: string, isPrivate: boolean) => void;
+  onCreateRoom: (roomName: string, options: any) => void;
   onJoinRoom: (roomName: string) => void;
   onJoinByCode: (roomCode: string) => void;
   onLogout: () => void;

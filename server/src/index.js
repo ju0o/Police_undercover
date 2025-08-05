@@ -87,9 +87,11 @@ io.on('connection', (socket) => {
       const roomsToCleanup = [];
       
       for (const [roomName, room] of allRooms) {
-        // 플레이어가 없거나 오래된 빈 방 정리
-        if (room.players.length === 0 || 
-            (room.players.length === 0 && Date.now() - room.lastActivity > 300000)) { // 5분
+        // 방 생성 후 30초 보호 기간 + 플레이어가 없고 10분 이상 비활성화된 방만 정리
+        const roomAge = Date.now() - room.createdAt;
+        if (room.players.length === 0 && 
+            roomAge > 30000 && // 30초 보호 기간
+            Date.now() - room.lastActivity > 600000) { // 10분 비활성화
           roomsToCleanup.push(roomName);
         }
       }
@@ -572,10 +574,11 @@ io.on('connection', (socket) => {
           moveManager.removePlayer(roomName, socket.id);
           roomManager.leaveRoom(roomName, socket.id);
           
-          // 룸이 비어있다면 즉시 삭제 목록에 추가
+          // 룸이 비어있어도 즉시 삭제하지 않음 (연결 불안정 고려)
           const remainingPlayers = roomManager.getRoomPlayers(roomName);
           if (remainingPlayers.length === 0) {
-            roomsToCleanup.push(roomName);
+            console.log(`[DISCONNECT] Room ${roomName} is now empty, but keeping for potential reconnections`);
+            // 방을 즉시 삭제하지 않고 roomManager의 자동 삭제 로직에 맡김
           } else {
             io.to(roomName).emit('roomUpdated', roomManager.getRoom(roomName));
             io.to(roomName).emit('playerDisconnected', {
@@ -586,12 +589,8 @@ io.on('connection', (socket) => {
         }
       }
       
-      // 빈 방들을 즉시 정리
-      for (const roomName of roomsToCleanup) {
-        console.log(`[DISCONNECT] Deleting empty room: ${roomName}`);
-        roomManager.deleteRoom(roomName);
-        gameStateManager.deleteGame(roomName);
-      }
+      // disconnect 시에는 방을 즉시 삭제하지 않음 (연결 불안정 고려)
+      // roomManager의 자동 삭제 로직과 getRooms의 정리 로직에 맡김
       
       // 공개방 목록 업데이트
       io.emit('roomsUpdated', roomManager.getPublicRooms());

@@ -14,7 +14,7 @@ interface Room {
 interface MainMenuProps {
   nickname: string;
   availableRooms: Room[];
-  onCreateRoom: (roomName: string, isPrivate: boolean) => void;
+  onCreateRoom: (roomName: string, options: any) => void;
   onJoinRoom: (roomName: string) => void;
   onJoinByCode: (roomCode: string) => void;
   onLogout: () => void;
@@ -34,6 +34,14 @@ const MainMenu: React.FC<MainMenuProps> = ({
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [roomCode, setRoomCode] = useState('');
   const [error, setError] = useState('');
+  
+  // 커스텀 옵션 상태
+  const [customOptions, setCustomOptions] = useState({
+    maxPlayers: 10,
+    impostorCount: 2,
+    killCooldown: 30,
+    gameMode: 'classic'
+  });
 
   const handleCreateRoom = () => {
     if (!newRoomName.trim()) {
@@ -45,10 +53,25 @@ const MainMenu: React.FC<MainMenuProps> = ({
       return;
     }
     
-    onCreateRoom(newRoomName.trim(), isPrivateRoom);
+    const roomOptions = {
+      isPrivate: isPrivateRoom,
+      maxPlayers: customOptions.maxPlayers,
+      impostorCount: customOptions.impostorCount,
+      killCooldown: customOptions.killCooldown,
+      gameMode: customOptions.gameMode,
+      ...(isPrivateRoom && { roomCode: Math.random().toString(36).substr(2, 6).toUpperCase() })
+    };
+    
+    onCreateRoom(newRoomName.trim(), roomOptions);
     setShowCreateRoom(false);
     setNewRoomName('');
     setIsPrivateRoom(false);
+    setCustomOptions({
+      maxPlayers: 10,
+      impostorCount: 2,
+      killCooldown: 30,
+      gameMode: 'classic'
+    });
     setError('');
   };
 
@@ -157,6 +180,60 @@ const MainMenu: React.FC<MainMenuProps> = ({
                     />
                     🔒 비공개방 (코드로만 입장 가능)
                   </label>
+                </div>
+
+                {/* 커스텀 옵션 */}
+                <div className="custom-options">
+                  <h4>🎮 커스텀 설정</h4>
+                  <div className="options-grid">
+                    <div className="option-group">
+                      <label>최대 플레이어</label>
+                      <select 
+                        value={customOptions.maxPlayers}
+                        onChange={(e) => setCustomOptions(prev => ({...prev, maxPlayers: parseInt(e.target.value)}))}
+                      >
+                        <option value="4">4명</option>
+                        <option value="6">6명</option>
+                        <option value="8">8명</option>
+                        <option value="10">10명</option>
+                        <option value="12">12명</option>
+                      </select>
+                    </div>
+                    <div className="option-group">
+                      <label>임포스터 수</label>
+                      <select 
+                        value={customOptions.impostorCount}
+                        onChange={(e) => setCustomOptions(prev => ({...prev, impostorCount: parseInt(e.target.value)}))}
+                      >
+                        <option value="1">1명</option>
+                        <option value="2">2명</option>
+                        <option value="3">3명</option>
+                      </select>
+                    </div>
+                    <div className="option-group">
+                      <label>킬 쿨다운</label>
+                      <select 
+                        value={customOptions.killCooldown}
+                        onChange={(e) => setCustomOptions(prev => ({...prev, killCooldown: parseInt(e.target.value)}))}
+                      >
+                        <option value="15">15초</option>
+                        <option value="30">30초</option>
+                        <option value="45">45초</option>
+                        <option value="60">60초</option>
+                      </select>
+                    </div>
+                    <div className="option-group">
+                      <label>게임 모드</label>
+                      <select 
+                        value={customOptions.gameMode}
+                        onChange={(e) => setCustomOptions(prev => ({...prev, gameMode: e.target.value}))}
+                      >
+                        <option value="classic">클래식</option>
+                        <option value="detective">탐정 모드</option>
+                        <option value="custom">커스텀</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
 
                 {error && <div className="error-message">{error}</div>}

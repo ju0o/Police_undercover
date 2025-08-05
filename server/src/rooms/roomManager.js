@@ -164,14 +164,14 @@ function leaveRoom(roomName, playerId) {
       console.log(`[${new Date().toISOString()}] Host transferred to ${room.players[0].nickname} in room: ${roomName}`);
     }
 
-    // 방이 비었으면 자동 삭제 (더 빠른 정리를 위해 5초로 단축)
+    // 방이 비었으면 자동 삭제 (연결 불안정 고려하여 60초로 연장)
     if (room.players.length === 0) {
       setTimeout(() => {
         if (rooms.has(roomName) && rooms.get(roomName).players.length === 0) {
           rooms.delete(roomName);
           console.log(`[${new Date().toISOString()}] Empty room deleted: ${roomName}`);
         }
-      }, 5000); // 5초 후 삭제
+      }, 60000); // 60초 후 삭제 (재연결 시간 고려)
     }
 
     console.log(`[${new Date().toISOString()}] Player ${leavingPlayer.nickname} left room: ${roomName}`);
