@@ -50,12 +50,7 @@ const server = http.createServer(app);
 // Socket.IO 서버 생성 - Render 최적화 설정
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://metacraze-c393c.web.app",
-      "https://metacraze-c393c.firebaseapp.com",
-      "http://localhost:5173",
-      "http://localhost:3000"
-    ],
+    origin: "*", // 모든 도메인 허용 - 연결 문제 해결
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: false, // Render에서는 false로 설정
     allowedHeaders: ["*"]
