@@ -5,20 +5,16 @@ const defaultServerUrl = 'https://police-undercover-server.onrender.com';
 
 export const SERVER_URL = defaultServerUrl;
 
+// GPT 권장: Render 무료 플랜 최적화 설정
 export const SOCKET_CONFIG = {
   autoConnect: false,
   reconnection: true,
   reconnectionDelay: 1000,
   reconnectionAttempts: 15,
-  timeout: 60000, // 60초로 증가
-  transports: ['polling'], // WebSocket 문제로 Polling만 사용
-  upgrade: true,
-  forceNew: false,
-  rememberUpgrade: false,
+  timeout: 60000,             // 60초 타임아웃 (GPT 권장)
+  transports: ['polling'],    // HTTP long-polling 강제 (GPT 권장)
+  upgrade: false,             // WebSocket 업그레이드 방지 (GPT 권장)
   withCredentials: false,
-  path: '/socket.io', // 트레일링 슬래시 제거
-  secure: true,
-  rejectUnauthorized: false,
-  closeOnBeforeunload: false,
-  addTrailingSlash: false // 트레일링 슬래시 방지
+  path: '/socket.io',         // 트레일링 슬래시 제거 (GPT 권장)
+  secure: true
 }; 

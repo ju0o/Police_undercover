@@ -47,31 +47,19 @@ app.get('/health', (req, res) => {
 
 const server = http.createServer(app);
 
-// Socket.IO 서버 생성 - Render WebSocket 지원 설정
+// GPT 권장: Render 무료 플랜 최적화 설정
 const io = new Server(server, {
   cors: {
-    origin: [
-      "https://metacraze-c393c.web.app",
-      "https://metacraze-c393c.firebaseapp.com", 
-      "http://localhost:5173",
-      "http://localhost:3000"
-    ], // 엄격한 CORS 정책으로 복원
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: false,
-    allowedHeaders: ["*"]
+    origin: "*", // GPT 권장: 단순화
+    methods: ["GET", "POST"],
+    credentials: false
   },
   allowEIO3: true,
-  transports: ['polling'], // WebSocket 문제로 Polling만 사용
-  pingTimeout: 60000,
-  pingInterval: 25000,
-  upgradeTimeout: 30000,
-  maxHttpBufferSize: 1e6,
-  connectTimeout: 60000,
-  serveClient: true,
-  path: '/socket.io', // 트레일링 슬래시 제거
-  cookie: false, // 쿠키 비활성화로 CORS 문제 방지
-  destroyUpgrade: false,
-  destroyUpgradeTimeout: 1000
+  transports: ['polling'],   // HTTP long-polling만 사용 (GPT 권장)
+  pingTimeout: 60000,        // 하트비트 타임아웃 증가 (GPT 권장)
+  pingInterval: 25000,       // 25초마다 하트비트 (GPT 권장)
+  connectTimeout: 60000,     // 연결 타임아웃 증가 (GPT 권장)
+  path: '/socket.io'         // 트레일링 슬래시 제거 (GPT 권장)
 });
 
 io.on('connection', (socket) => {
