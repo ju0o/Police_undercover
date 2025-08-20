@@ -1,0 +1,355 @@
+/* 🤖 AI 위키 도우미 */
+.aiAssistant {
+  margin-bottom: 1.5rem;
+}
+
+.aiToggle {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.aiToggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.aiChat {
+  background: var(--color-surface);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.aiMessages {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.aiMessage {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.aiMessage.bot {
+  background: rgba(102, 126, 234, 0.1);
+  color: var(--color-text);
+  margin-right: 1rem;
+}
+
+.aiMessage.user {
+  background: var(--color-primary);
+  color: white;
+  margin-left: 1rem;
+  text-align: right;
+}
+
+.aiInput {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-top: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.aiInput input {
+  flex: 1;
+  font-size: 0.8rem;
+}
+
+.aiInput button {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* 🎯 스마트 추천 시스템 */
+.smartRecs {
+  margin-bottom: 1.5rem;
+}
+
+.recItem {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 142, 83, 0.1));
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid #ff6b6b;
+  transition: all 0.3s ease;
+}
+
+.recItem:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
+}
+
+.recTitle {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.recReason {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.recConfidence {
+  font-size: 0.7rem;
+  color: #ff6b6b;
+  font-weight: 500;
+}
+
+/* 🌟 실시간 위키 이벤트 */
+.liveEvents {
+  margin-bottom: 1.5rem;
+}
+
+.eventItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  background: rgba(0, 164, 149, 0.05);
+  transition: all 0.3s ease;
+  animation: eventFadeIn 0.5s ease-out;
+}
+
+@keyframes eventFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.eventItem:hover {
+  background: rgba(0, 164, 149, 0.1);
+  transform: translateY(-1px);
+}
+
+.eventIcon {
+  font-size: 1rem;
+  margin-top: 0.1rem;
+}
+
+.eventContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventText {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--color-text);
+  margin-bottom: 0.2rem;
+}
+
+.eventTime {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+/* 🎨 테마 커스터마이저 */
+.themeCustomizer {
+  margin-bottom: 1.5rem;
+}
+
+.themeToggle {
+  width: 100%;
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+}
+
+.themeToggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+}
+
+.themeOptions {
+  margin-top: 0.5rem;
+}
+
+.themeOption {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border: 1px solid rgba(240, 147, 251, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.themeOption:hover {
+  background: rgba(240, 147, 251, 0.1);
+}
+
+.themeOption.active {
+  background: rgba(240, 147, 251, 0.2);
+  border-color: #f093fb;
+}
+
+.colorPreview {
+  display: flex;
+  gap: 2px;
+}
+
+.colorPreview span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* 🎵 집중 모드 & 백색소음 */
+.focusMode {
+  margin-bottom: 1.5rem;
+}
+
+.soundSelector {
+  margin-bottom: 0.75rem;
+}
+
+.soundOption {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.soundOption:hover {
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.soundOption.active {
+  background: rgba(52, 152, 219, 0.2);
+  border-color: #3498db;
+}
+
+.soundLabel {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.soundDesc {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.1rem;
+}
+
+.playing {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  animation: playingPulse 2s ease-in-out infinite;
+}
+
+@keyframes playingPulse {
+  0%, 100% { box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); }
+  50% { box-shadow: 0 6px 25px rgba(52, 152, 219, 0.5); }
+}
+
+.playingInfo {
+  background: rgba(52, 152, 219, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.waveform {
+  font-size: 0.8rem;
+  color: #3498db;
+  animation: waveAnimation 1.5s ease-in-out infinite;
+}
+
+@keyframes waveAnimation {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.playingText {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* 🚀 위키 터보 모드 */
+.turboMode {
+  margin-bottom: 1.5rem;
+}
+
+.turboStats {
+  margin-bottom: 0.75rem;
+}
+
+.turboItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.1));
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.turboIcon {
+  font-size: 1.2rem;
+  animation: turboSpin 2s linear infinite;
+}
+
+@keyframes turboSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.turboLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.turboValue {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffc107;
+}
+
+.turboButton {
+  background: linear-gradient(135deg, #ffc107, #ff9800) !important;
+  color: white !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: turboGlow 2s ease-in-out infinite;
+}
+
+@keyframes turboGlow {
+  0%, 100% { box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3); }
+  50% { box-shadow: 0 6px 25px rgba(255, 193, 7, 0.6); }
+}

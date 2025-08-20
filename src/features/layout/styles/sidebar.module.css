@@ -1,0 +1,791 @@
+/* 사이드바 스타일 */
+.sidebar {
+  width: 280px;
+  height: 100vh;
+  background: var(--gradient-card);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid var(--glass-border);
+  overflow-y: auto;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarHeader {
+  padding: var(--spacing-xl) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-divider);
+  background: linear-gradient(135deg, var(--glass-effect), transparent);
+}
+
+.sidebarTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.sidebarContent {
+  flex: 1;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* 카테고리 그룹 */
+.categoryGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.categoryTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0;
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px solid var(--color-divider);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.categoryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.categoryItem {
+  margin: 0;
+}
+
+.categoryLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
+}
+
+.categoryLink:hover {
+  color: var(--color-text);
+  background: var(--glass-effect);
+  transform: translateX(4px);
+}
+
+.categoryName {
+  flex: 1;
+}
+
+.categoryCount {
+  background: var(--color-background-lighter);
+  color: var(--color-text-muted);
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* 빠른 액션 */
+.quickActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* 북마크 섹션 */
+.bookmarksSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.bookmarkList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bookmarkItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-xs);
+}
+
+.bookmarkItem:hover {
+  background: var(--glass-effect);
+  color: var(--color-text);
+  transform: translateX(2px);
+}
+
+.bookmarkIcon {
+  width: 16px;
+  text-align: center;
+}
+
+.bookmarkText {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 히스토리 섹션 */
+.historySection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.historyItem {
+  display: block;
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-fast);
+}
+
+.historyItem:hover {
+  background: var(--glass-effect);
+}
+
+.historyContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.historyText {
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.historyTime {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-tight);
+}
+
+/* 통계 위젯 */
+.statsWidget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.statsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-background-lighter);
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+}
+
+.statItem:hover {
+  background: var(--glass-effect);
+}
+
+.statIcon {
+  font-size: var(--font-size-sm);
+  width: 20px;
+  text-align: center;
+}
+
+.statContent {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.statNumber {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* 실시간 트렌드 */
+.trendingSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.trendingList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.trendingItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.trendingItem:hover {
+  background: var(--glass-effect);
+}
+
+.trendingRank {
+  width: 20px;
+  height: 20px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.trendingContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.trendingTitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+  font-weight: 500;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trendingStats {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* 위키 챌린지 */
+.challengeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.challengeCard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.challengeHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.challengeIcon {
+  font-size: var(--font-size-lg);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.challengeInfo {
+  flex: 1;
+}
+
+.challengeTitle {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.challengeDesc {
+  font-size: var(--font-size-xs);
+  opacity: 0.9;
+}
+
+.challengeProgress {
+  margin-bottom: var(--spacing-sm);
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-xs);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f5ff, #00d4ff);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: var(--font-size-xs);
+  text-align: center;
+  opacity: 0.9;
+}
+
+.challengeReward {
+  font-size: var(--font-size-xs);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-xs);
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* 커뮤니티 활동 */
+.communitySection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.communityStats {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.communityItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  background: var(--color-background-lighter);
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+}
+
+.communityItem:hover {
+  background: var(--glass-effect);
+}
+
+.communityIcon {
+  font-size: var(--font-size-lg);
+}
+
+.communityContent {
+  text-align: center;
+}
+
+.communityNumber {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: var(--line-height-tight);
+}
+
+.communityLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-tight);
+}
+
+.communityButton {
+  display: block;
+  text-align: center;
+  padding: var(--spacing-sm);
+  background: var(--gradient-primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  transition: all var(--transition-normal);
+}
+
+.communityButton:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 날씨 위젯 */
+.weatherWidget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.weatherCard {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.weatherMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.weatherIcon {
+  font-size: var(--font-size-3xl);
+}
+
+.weatherTemp {
+  display: flex;
+  align-items: flex-start;
+}
+
+.tempNumber {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+}
+
+.tempUnit {
+  font-size: var(--font-size-sm);
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+.weatherDetails {
+  text-align: center;
+}
+
+.weatherLocation {
+  font-size: var(--font-size-xs);
+  margin-bottom: var(--spacing-xs);
+  opacity: 0.9;
+}
+
+.weatherDesc {
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* 스크롤바 스타일링 */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: var(--color-background-light);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 240px;
+  }
+  
+  .sidebarContent {
+    padding: var(--spacing-md);
+    gap: var(--spacing-lg);
+  }
+  
+  .categoryLink {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .sidebarContent {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  
+  .categoriesSection {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  
+  .categoryGroup {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .categoryList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    max-height: 50vh;
+  }
+  
+  .sidebarContent {
+    padding: var(--spacing-sm);
+  }
+  
+  .categoryList {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+  
+  .categoryLink {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  
+  .categoryCount {
+    font-size: 10px;
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  .categoryLink,
+  .navLink {
+    min-height: 44px; /* 터치하기 쉬운 최소 크기 */
+    display: flex;
+    align-items: center;
+  }
+  
+  .categoryLink {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100vw;
+    transform: translateX(-100%);
+    transition: transform var(--transition-normal);
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .sidebarContent {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  
+  .categoriesSection {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  
+  .categoryGroup {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .categoryList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    max-height: 50vh;
+  }
+  
+  .sidebarContent {
+    padding: var(--spacing-sm);
+  }
+  
+  .categoryList {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+  
+  .categoryLink {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  
+  .categoryCount {
+    font-size: 10px;
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  .categoryLink,
+  .navLink {
+    min-height: 44px; /* 터치하기 쉬운 최소 크기 */
+    display: flex;
+    align-items: center;
+  }
+  
+  .categoryLink {
+    padding: 12px;
+  }
+}
+
+/* 다크모드 세부 조정 */
+@media (prefers-color-scheme: dark) {
+  .categoryCount {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .sidebarContent {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  
+  .categoriesSection {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  
+  .categoryGroup {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .categoryList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    max-height: 50vh;
+  }
+  
+  .sidebarContent {
+    padding: var(--spacing-sm);
+  }
+  
+  .categoryList {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+  
+  .categoryLink {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  
+  .categoryCount {
+    font-size: 10px;
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  .categoryLink,
+  .navLink {
+    min-height: 44px; /* 터치하기 쉬운 최소 크기 */
+    display: flex;
+    align-items: center;
+  }
+  
+  .categoryLink {
+    padding: 12px;
+  }
+}

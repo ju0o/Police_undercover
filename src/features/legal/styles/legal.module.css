@@ -1,0 +1,314 @@
+/* 법적 문서 모달 스타일 */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  animation: overlay-show 0.3s ease-out;
+}
+
+@keyframes overlay-show {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalContent {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 800px;
+  height: 85vh;
+  background: var(--gradient-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-xl);
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  animation: modal-show 0.3s ease-out;
+}
+
+@keyframes modal-show {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xl) var(--spacing-2xl);
+  border-bottom: 1px solid var(--color-divider);
+  background: linear-gradient(135deg, var(--glass-effect), transparent);
+}
+
+.modalTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.closeButton:hover {
+  background: var(--glass-effect);
+  color: var(--color-text);
+}
+
+.modalBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-xl) var(--spacing-2xl);
+}
+
+.modalFooter {
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  border-top: 1px solid var(--color-divider);
+  display: flex;
+  justify-content: flex-end;
+  background: linear-gradient(transparent, var(--glass-effect));
+}
+
+/* 법적 문서 콘텐츠 스타일 */
+.legalContent {
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text);
+}
+
+.section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-lg) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--color-primary);
+  display: inline-block;
+}
+
+.subsection {
+  margin: var(--spacing-lg) 0;
+}
+
+.subsectionTitle {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.paragraph {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-md) 0;
+}
+
+.listItem {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
+  margin: var(--spacing-sm) 0;
+  padding-left: var(--spacing-lg);
+  position: relative;
+}
+
+.listItem::before {
+  content: '•';
+  color: var(--color-primary);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+.listItem strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* 스크롤바 스타일링 */
+.modalBody::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modalBody::-webkit-scrollbar-track {
+  background: var(--color-background-light);
+  border-radius: 4px;
+}
+
+.modalBody::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.modalBody::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .modalContent {
+    width: 95vw;
+    height: 90vh;
+    border-radius: 16px;
+  }
+  
+  .modalHeader {
+    padding: var(--spacing-lg);
+  }
+  
+  .modalTitle {
+    font-size: var(--font-size-lg);
+  }
+  
+  .modalBody {
+    padding: var(--spacing-lg);
+  }
+  
+  .modalFooter {
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+  
+  .sectionTitle {
+    font-size: var(--font-size-base);
+  }
+  
+  .paragraph,
+  .listItem {
+    font-size: var(--font-size-xs);
+  }
+}
+
+/* 법적 문서 페이지 스타일 */
+.legalPageHeader {
+  text-align: center;
+  padding: var(--spacing-3xl) 0;
+  background: var(--gradient-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  margin-bottom: var(--spacing-2xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.pageTitle {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-lg) 0;
+  background: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pageSubtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-xl) 0;
+  line-height: var(--line-height-relaxed);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pageInfo {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.footer {
+  margin-top: var(--spacing-3xl);
+  padding: var(--spacing-2xl);
+  background: var(--color-background-lighter);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.footer p {
+  margin: var(--spacing-sm) 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.footer p:first-child {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 다크모드 최적화 */
+@media (prefers-color-scheme: dark) {
+  .modalContent {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .listItem::before {
+    color: var(--color-primary-light);
+  }
+  
+  .footer {
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+/* 반응형 - 법적 문서 페이지 */
+@media (max-width: 768px) {
+  .legalPageHeader {
+    padding: var(--spacing-2xl) var(--spacing-lg);
+  }
+  
+  .pageTitle {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .pageSubtitle {
+    font-size: var(--font-size-base);
+  }
+  
+  .pageInfo {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+}

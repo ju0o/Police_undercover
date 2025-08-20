@@ -1,0 +1,66 @@
+/* 전체 레이아웃 스타일 */
+.appLayout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--gradient-background);
+}
+
+.mainArea {
+  flex: 1;
+  margin-left: 280px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 120px var(--spacing-2xl) var(--spacing-2xl);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: calc(100vh - 120px);
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+  .mainArea {
+    margin-left: 240px;
+  }
+  
+  .mainContent {
+    padding: 100px var(--spacing-lg) var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .appLayout {
+    flex-direction: column;
+  }
+  
+  .mainArea {
+    margin-left: 0;
+    margin-top: 0;
+  }
+  
+  .mainContent {
+    padding: 80px var(--spacing-md) var(--spacing-md);
+    min-height: calc(100vh - 80px);
+  }
+}
+
+@media (max-width: 480px) {
+  .mainContent {
+    padding: 70px var(--spacing-sm) var(--spacing-sm);
+    min-height: calc(100vh - 70px);
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  .mainContent {
+    /* 터치 디바이스에서 더 큰 터치 영역 */
+    padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom, 0px));
+  }
+}
+

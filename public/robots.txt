@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://zerowiki-2bd39.web.app/sitemap.xml
+
+# Disallow admin and auth pages
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /profile
+Disallow: /moderation/
+Disallow: /notifications
+
+# Allow main content
+Allow: /wiki/
+Allow: /search
+Allow: /legal/
+Allow: /
+
+# Crawl delay
+Crawl-delay: 1

@@ -1,0 +1,193 @@
+/* 한글 타이포그래피 최적화 */
+
+/* 구글 폰트 로드 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+/* 한글 최적화 폰트 스택 */
+.koreanText {
+  font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.monoText {
+  font-family: 'JetBrains Mono', 'D2Coding', 'Consolas', 'Monaco', monospace;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* 제목 스타일 */
+.heading1 {
+  font-size: var(--font-size-4xl);
+  font-weight: 800;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--spacing-xl) 0;
+}
+
+.heading2 {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.01em;
+  margin: var(--spacing-2xl) 0 var(--spacing-lg) 0;
+}
+
+.heading3 {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  line-height: var(--line-height-normal);
+  margin: var(--spacing-xl) 0 var(--spacing-md) 0;
+}
+
+.heading4 {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  line-height: var(--line-height-normal);
+  margin: var(--spacing-lg) 0 var(--spacing-sm) 0;
+}
+
+/* 본문 스타일 */
+.bodyLarge {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+  font-weight: 400;
+}
+
+.bodyNormal {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  font-weight: 400;
+}
+
+.bodySmall {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  font-weight: 400;
+}
+
+.caption {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* 특수 텍스트 스타일 */
+.highlight {
+  background: linear-gradient(120deg, rgba(0, 164, 149, 0.2) 0%, rgba(0, 164, 149, 0.1) 100%);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.code {
+  background: var(--color-background-lighter);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+  color: var(--color-text-accent);
+}
+
+.link {
+  color: var(--color-primary);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 164, 149, 0.3);
+  transition: all var(--transition-fast);
+}
+
+.link:hover {
+  border-bottom-color: var(--color-primary);
+  background: rgba(0, 164, 149, 0.05);
+}
+
+/* 문단 간격 */
+.paragraph {
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* 리스트 스타일 */
+.list {
+  margin: var(--spacing-lg) 0;
+  padding-left: var(--spacing-xl);
+}
+
+.listItem {
+  margin: var(--spacing-sm) 0;
+  line-height: var(--line-height-normal);
+}
+
+/* 인용구 */
+.blockquote {
+  margin: var(--spacing-xl) 0;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-left: 4px solid var(--color-primary);
+  background: linear-gradient(90deg, 
+    rgba(0, 164, 149, 0.08), 
+    rgba(0, 164, 149, 0.02));
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-accent);
+}
+
+/* 테이블 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacing-xl) 0;
+  background: var(--color-background-lighter);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.tableHeader {
+  background: var(--color-background-light);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.tableCell {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-divider);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.tableCell:last-child {
+  border-right: none;
+}
+
+/* 반응형 타이포그래피 */
+@media (max-width: 768px) {
+  .heading1 {
+    font-size: var(--font-size-3xl);
+  }
+  
+  .heading2 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .heading3 {
+    font-size: var(--font-size-xl);
+  }
+  
+  .bodyLarge {
+    font-size: var(--font-size-base);
+  }
+  
+  .blockquote {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-base);
+  }
+}

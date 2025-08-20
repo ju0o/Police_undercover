@@ -1,0 +1,339 @@
+/* 헤더 스타일 */
+.header {
+  height: 80px;
+  background: var(--gradient-card);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0;
+  z-index: 200;
+  box-shadow: var(--shadow-sm);
+}
+
+.headerContent {
+  height: 100%;
+  padding: 0 var(--spacing-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xl);
+  max-width: none;
+}
+
+/* 로고 */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logoIcon {
+  font-size: var(--font-size-2xl);
+  filter: drop-shadow(0 2px 4px rgba(0, 164, 149, 0.3));
+}
+
+.logoText {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+/* 검색 영역 */
+.searchForm {
+  flex: 1;
+  max-width: 600px;
+  position: relative;
+}
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  background: var(--color-background-lighter);
+  border: 2px solid var(--color-border);
+  border-radius: 24px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.searchContainer:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(0, 164, 149, 0.1);
+}
+
+.searchFocused {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(0, 164, 149, 0.15);
+  background: var(--color-background-light);
+}
+
+.searchIcon {
+  font-size: var(--font-size-lg);
+  margin-right: var(--spacing-sm);
+  color: var(--color-text-muted);
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  padding: var(--spacing-xs) 0;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.searchClear {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  margin-left: var(--spacing-sm);
+}
+
+.searchClear:hover {
+  color: var(--color-text);
+  background: var(--glass-effect);
+}
+
+/* 검색 제안 */
+.searchSuggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--gradient-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  margin-top: var(--spacing-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.suggestionGroup {
+  padding: var(--spacing-md);
+}
+
+.suggestionGroup:not(:last-child) {
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.suggestionTitle {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.suggestionItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
+}
+
+.suggestionItem:hover {
+  background: var(--glass-effect);
+  color: var(--color-primary);
+}
+
+.suggestionIcon {
+  width: 16px;
+  text-align: center;
+}
+
+/* 헤더 액션 */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+/* 사용자 메뉴 */
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 12px;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.userMenu:hover {
+  background: var(--glass-effect);
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.userName {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+}
+
+.userRole {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-tight);
+}
+
+/* 빠른 액션 */
+.quickActions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* 인증 액션 */
+.authActions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+  .header {
+    left: 240px;
+  }
+  
+  .headerContent {
+    padding: 0 var(--spacing-lg);
+    gap: var(--spacing-lg);
+  }
+  
+  .searchForm {
+    max-width: 400px;
+  }
+  
+  .quickActions {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    left: 0;
+    padding-left: 60px; /* 햄버거 메뉴 공간 */
+  }
+  
+  .headerContent {
+    padding: 0 var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+  
+  .logoText {
+    display: none;
+  }
+  
+  .searchForm {
+    max-width: 300px;
+  }
+  
+  .userInfo {
+    display: none;
+  }
+  
+  .authActions {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: var(--spacing-sm) 0;
+    height: 60px;
+  }
+  
+  .headerContent {
+    padding: 0 var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+  
+  .searchForm {
+    max-width: 180px;
+    flex: 1;
+  }
+  
+  .searchInput {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm);
+  }
+  
+  .headerActions {
+    gap: var(--spacing-xs);
+  }
+  
+  .authActions {
+    display: none; /* 매우 작은 화면에서는 숨김 */
+  }
+  
+  .userMenu {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+}
+
+/* 터치 디바이스 최적화 */
+@media (hover: none) and (pointer: coarse) {
+  .searchInput {
+    font-size: 16px; /* iOS에서 줌 방지 */
+  }
+  
+  .userMenu,
+  .authActions button {
+    min-height: 44px; /* 터치하기 쉬운 최소 크기 */
+    min-width: 44px;
+  }
+  
+  .searchContainer {
+    min-height: 44px;
+  }
+}

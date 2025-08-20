@@ -1,0 +1,162 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function uid() { return request.auth.uid; }
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(uid())).data.role;
+    }
+    function isSubadmin() { return isSignedIn() && userRole() == 'subadmin'; }
+    function isAdvanced() { return isSignedIn() && (userRole() == 'advanced' || isSubadmin()); }
+    function isIntermediate() { return isSignedIn() && (userRole() == 'intermediate' || isAdvanced()); }
+
+    function serverTimestampOnly(field) {
+      return request.time == request.resource.data[field];
+    }
+
+    // Public read access (legal excluded if needed)
+    match /{document=**} {
+      allow get, list: if true;
+    }
+
+    match /users/{userId} {
+      allow create: if isSignedIn() && request.resource.data.role == 'newbie' &&
+        request.resource.data.createdAt == request.time && request.resource.data.updatedAt == request.time &&
+        request.resource.data.blocked == false && request.resource.data.email == request.auth.token.email &&
+        userId == uid();
+      allow read: if isSignedIn() && userId == uid() || isSubadmin();
+      allow update: if isSignedIn() && userId == uid() &&
+        request.resource.data.role == resource.data.role &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (
+        isSubadmin() ||
+        (isAdvanced() && request.resource.data.status == 'pending')
+      ) && request.resource.data.createdBy == uid() &&
+        serverTimestampOnly('createdAt') && serverTimestampOnly('updatedAt');
+      allow update: if isSignedIn() && (
+        isSubadmin() ||
+        (isAdvanced() && request.resource.data.status == 'pending')
+      ) && request.resource.data.updatedAt == request.time;
+      allow delete: if isSubadmin();
+
+      match /types/{typeId} {
+        allow read: if true;
+        allow create: if isSignedIn() && (
+          isSubadmin() ||
+          (isAdvanced() && request.resource.data.status in ['pending','approved']) ||
+          (isIntermediate() && request.resource.data.status == 'pending')
+        ) && request.resource.data.createdBy == uid() && serverTimestampOnly('createdAt') && serverTimestampOnly('updatedAt');
+        allow update: if isSignedIn() && (
+          isSubadmin() ||
+          (isAdvanced() && request.resource.data.status in ['pending','approved']) ||
+          (isIntermediate() && request.resource.data.status == 'pending')
+        ) && request.resource.data.updatedAt == request.time;
+        allow delete: if isSubadmin();
+
+        match /contents/{contentId} {
+          allow read: if true;
+          allow create: if isSignedIn() && (
+            isSubadmin() ||
+            isAdvanced() ||
+            isIntermediate()
+          ) && request.resource.data.createdBy == uid() && serverTimestampOnly('createdAt') && serverTimestampOnly('updatedAt') && request.resource.data.version == 1 && request.resource.data.status in ['approved','pending'];
+          allow update: if isSignedIn() && (
+            isSubadmin() ||
+            (!isSubadmin() && request.resource.data.status == 'pending')
+          ) && request.resource.data.updatedAt == request.time && request.resource.data.version == resource.data.version + 1;
+          allow delete: if isSubadmin();
+        }
+      }
+    }
+
+    match /proposals/{proposalId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.createdBy == uid() &&
+        serverTimestampOnly('createdAt') && serverTimestampOnly('updatedAt') &&
+        request.resource.data.status == 'pending';
+      allow update: if isSignedIn() && (
+        (request.resource.data.createdBy == uid() && request.resource.data.status == 'pending') ||
+        (isSubadmin() && (
+          request.resource.data.status in ['approved','rejected'] &&
+          (request.resource.data.approvedBy == uid()) && serverTimestampOnly('approvedAt')
+        ))
+      ) && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // Discussions & comments
+    match /discussions/{threadId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.createdBy == uid() && serverTimestampOnly('createdAt') && serverTimestampOnly('lastActivityAt') && request.resource.data.status in ['open','locked'];
+      allow update: if isSignedIn() && (
+        (isSubadmin()) ||
+        (request.resource.data.status == resource.data.status) // non-status fields can be updated by owner? keep simple: subadmin only for lock
+      ) && serverTimestampOnly('lastActivityAt');
+      allow delete: if isSubadmin();
+
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isSignedIn() && request.resource.data.createdBy == uid() && serverTimestampOnly('createdAt') && serverTimestampOnly('updatedAt') && request.resource.data.edited == false;
+        allow update: if isSignedIn() && resource.data.createdBy == uid() && request.resource.data.updatedAt == request.time;
+        allow delete: if isSubadmin() || (isSignedIn() && resource.data.createdBy == uid());
+      }
+    }
+
+    // Watchlists & notifications (scoped to user)
+    match /watchlists/{uidParam}/items/{itemId} {
+      allow read, create, update, delete: if isSignedIn() && uidParam == uid();
+    }
+    match /notifications/{uidParam}/items/{notifId} {
+      allow read, create, update, delete: if isSignedIn() && uidParam == uid();
+    }
+
+    // Templates (read all, write subadmin)
+    match /templates/{templateId} {
+      allow read: if true;
+      allow create, update, delete: if isSubadmin();
+    }
+
+    // Categories (admin-managed)
+    match /categories/{groupId} {
+      allow read: if true;
+      allow create, update, delete: if isSubadmin();
+      match /items/{itemId} {
+        allow read: if true;
+        allow create, update, delete: if isSubadmin();
+      }
+    }
+
+    // Role requests
+    match /roleRequests/{requestId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.uid == uid() && serverTimestampOnly('createdAt') && request.resource.data.status == 'pending';
+      allow update: if isSignedIn() && (
+        (isSubadmin() && request.resource.data.status in ['approved','rejected'] && request.resource.data.reviewedBy == uid() && serverTimestampOnly('reviewedAt')) ||
+        (request.resource.data.uid == uid() && request.resource.data.status == 'pending')
+      );
+      allow delete: if false;
+    }
+    match /annotations/{annotationId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.createdBy == uid() && serverTimestampOnly('createdAt') && serverTimestampOnly('updatedAt');
+      allow update: if isSignedIn() && resource.data.createdBy == uid() && request.resource.data.updatedAt == request.time;
+      allow delete: if isSubadmin() || (isSignedIn() && resource.data.createdBy == uid());
+    }
+
+    match /activityLogs/{logId} {
+      allow read: if isSubadmin();
+      allow create: if isSignedIn() && request.resource.data.actor == uid() && serverTimestampOnly('createdAt');
+      allow update, delete: if false;
+    }
+  }
+}
+
+

@@ -1,0 +1,379 @@
+/* 나무위키 스타일 뷰어 - 한글 가독성 최적화 */
+
+.wikiViewer {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: var(--gradient-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.wikiHeader {
+  padding: var(--spacing-2xl) var(--spacing-2xl) var(--spacing-xl);
+  border-bottom: 1px solid var(--color-divider);
+  background: linear-gradient(135deg, var(--glass-effect), transparent);
+}
+
+.wikiTitle {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
+}
+
+.wikiMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: 20px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.statusBadge.approved {
+  background: linear-gradient(135deg, var(--color-success), #4caf50);
+  color: white;
+}
+
+.statusBadge.pending {
+  background: linear-gradient(135deg, var(--color-warning), #ff9800);
+  color: white;
+}
+
+.statusBadge.rejected {
+  background: linear-gradient(135deg, var(--color-error), #f44336);
+  color: white;
+}
+
+.wikiActions {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  margin-left: auto;
+}
+
+.wikiContent {
+  padding: var(--spacing-2xl);
+}
+
+/* 컨텐츠 블록 스타일링 */
+.contentBlock {
+  position: relative;
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-lg);
+  border-radius: 12px;
+  transition: all var(--transition-normal);
+}
+
+.contentBlock:hover {
+  background: var(--glass-effect);
+}
+
+.contentBlock:hover .inlineMenu {
+  opacity: 1;
+}
+
+.inlineMenu {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+/* 블록 타입별 스타일 */
+.blockParagraph {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.blockQuote {
+  border-left: 4px solid var(--color-primary);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: linear-gradient(90deg, 
+    rgba(0, 164, 149, 0.08), 
+    rgba(0, 164, 149, 0.02));
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-accent);
+  animation: quote-fade-in 0.6s ease-out;
+}
+
+@keyframes quote-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.blockLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 8px;
+  transition: all var(--transition-normal);
+  background: rgba(0, 164, 149, 0.05);
+  border: 1px solid rgba(0, 164, 149, 0.2);
+}
+
+.blockLink:hover {
+  background: rgba(0, 164, 149, 0.1);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 164, 149, 0.2);
+}
+
+.blockLink::after {
+  content: '↗';
+  font-size: var(--font-size-sm);
+  transition: transform var(--transition-fast);
+}
+
+.blockLink:hover::after {
+  transform: translate(2px, -2px) scale(1.1);
+}
+
+.blockImage {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.blockImage:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg);
+}
+
+.blockImage img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.imageCaption {
+  padding: var(--spacing-lg);
+  background: var(--color-background-lighter);
+  border-top: 1px solid var(--color-divider);
+}
+
+.imageMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.blockCode {
+  background: var(--color-background-lighter);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.codeHeader {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-background-light);
+  border-bottom: 1px solid var(--color-divider);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.codeContent {
+  padding: var(--spacing-lg);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  overflow-x: auto;
+}
+
+.blockEmbed {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  background: var(--color-background-lighter);
+  border: 1px solid var(--color-border);
+}
+
+.embedPlaceholder {
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* 탭 시스템 개선 */
+.wikiTabs {
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--glass-effect);
+  padding: 0 var(--spacing-2xl);
+}
+
+.wikiTabsList {
+  display: flex;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.wikiTabsTrigger {
+  background: transparent;
+  border: none;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border-bottom: 3px solid transparent;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.wikiTabsTrigger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  z-index: -1;
+}
+
+.wikiTabsTrigger:hover {
+  color: var(--color-text);
+}
+
+.wikiTabsTrigger:hover::before {
+  opacity: 0.05;
+}
+
+.wikiTabsTrigger[data-state="active"] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background: var(--glass-effect);
+}
+
+.wikiTabsContent {
+  padding: var(--spacing-2xl);
+  min-height: 400px;
+}
+
+/* 목차 스타일 */
+.tableOfContents {
+  background: var(--gradient-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.tocTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.tocList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tocItem {
+  margin: var(--spacing-sm) 0;
+}
+
+.tocLink {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 6px;
+  display: block;
+  transition: all var(--transition-normal);
+}
+
+.tocLink:hover {
+  color: var(--color-primary);
+  background: var(--glass-effect);
+}
+
+/* 반응형 최적화 */
+@media (max-width: 768px) {
+  .wikiViewer {
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  .wikiHeader {
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+  
+  .wikiTitle {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .wikiContent {
+    padding: var(--spacing-lg);
+  }
+  
+  .wikiTabsContent {
+    padding: var(--spacing-lg);
+  }
+  
+  .contentBlock {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+  }
+  
+  .blockQuote {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-base);
+  }
+}
+
+/* 다크모드 세부 조정 */
+@media (prefers-color-scheme: dark) {
+  .blockCode {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .codeHeader {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- 홈페이지 -->
+  <url>
+    <loc>https://zerowiki-2bd39.web.app/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- 검색 페이지 -->
+  <url>
+    <loc>https://zerowiki-2bd39.web.app/search</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- 법적 문서 -->
+  <url>
+    <loc>https://zerowiki-2bd39.web.app/legal/terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <url>
+    <loc>https://zerowiki-2bd39.web.app/legal/privacy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <!-- 회원가입 -->
+  <url>
+    <loc>https://zerowiki-2bd39.web.app/auth/signup</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- 제안 목록 -->
+  <url>
+    <loc>https://zerowiki-2bd39.web.app/proposals</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- 동적 콘텐츠는 Functions로 생성할 예정 -->
+  <!-- /wiki/* 페이지들은 Firestore 데이터를 기반으로 동적 생성 -->
+</urlset>

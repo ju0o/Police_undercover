@@ -1,0 +1,60 @@
+:root {
+  --bg: #0b0f19;
+  --panel: #111627;
+  --text: #e6e8f0;
+  --muted: #94a3b8;
+  --primary: #4f46e5;
+  --primary-600: #4338ca;
+  --accent: #22d3ee;
+  --danger: #ef4444;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, Apple Color Emoji, Segoe UI Emoji;
+  color-scheme: dark;
+  color: var(--text);
+  background: radial-gradient(1200px 800px at 20% -10%, #1b2344 0%, transparent 60%),
+    radial-gradient(1000px 700px at 120% 0%, #13223a 0%, transparent 50%), var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+
+#root { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 10px;
+  border: 0;
+  padding: 10px 14px;
+  font-size: 1em;
+  font-weight: 600;
+  font-family: inherit;
+  background: linear-gradient(180deg, var(--primary), var(--primary-600));
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+}
+button:hover { filter: brightness(1.08); }
+button:active { transform: translateY(1px); }
+
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+/* Light is not targeted; design uses dark aesthetic by default */

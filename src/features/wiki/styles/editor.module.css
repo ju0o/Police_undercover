@@ -1,0 +1,584 @@
+/* 나무위키 스타일 에디터 - 입력 편의성 최적화 */
+
+.wikiEditor {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: var(--gradient-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.editorHeader {
+  padding: var(--spacing-xl) var(--spacing-2xl);
+  border-bottom: 1px solid var(--color-divider);
+  background: linear-gradient(135deg, var(--glass-effect), transparent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editorTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.editorActions {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.saveButton {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.saveButton:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  filter: brightness(1.1);
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.previewButton {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.previewButton:hover {
+  color: var(--color-text);
+  border-color: var(--color-primary);
+  background: var(--glass-effect);
+}
+
+.editorContent {
+  padding: var(--spacing-2xl);
+}
+
+/* 블록 에디터 */
+.blockEditor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.blockItem {
+  background: var(--color-background-lighter);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.blockItem:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 164, 149, 0.1);
+}
+
+.blockItem.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+  z-index: 1000;
+}
+
+.blockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-background-light);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.blockType {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-accent);
+}
+
+.blockTypeIcon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blockActions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.dragHandle {
+  cursor: grab;
+  color: var(--color-text-muted);
+  padding: var(--spacing-xs);
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.dragHandle:hover {
+  color: var(--color-text);
+  background: var(--glass-effect);
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.deleteBlockButton {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.deleteBlockButton:hover {
+  color: var(--color-error);
+  background: rgba(239, 83, 80, 0.1);
+}
+
+.blockContent {
+  padding: var(--spacing-lg);
+}
+
+/* 입력 필드 개선 */
+.blockTextarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-korean);
+  line-height: var(--line-height-relaxed);
+  resize: vertical;
+  min-height: 120px;
+  padding: 0;
+  outline: none;
+}
+
+.blockTextarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.blockTextarea:focus {
+  outline: none;
+}
+
+.blockInput {
+  width: 100%;
+  background: var(--color-background-light);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  transition: all var(--transition-normal);
+}
+
+.blockInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 164, 149, 0.1);
+  background: var(--color-background-lighter);
+}
+
+/* 메타데이터 입력 */
+.metaFields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.metaField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.metaLabel {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 블록 타입 선택기 */
+.blockTypeSelector {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.blockTypeButton {
+  background: var(--color-background-lighter);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.blockTypeButton:hover {
+  color: var(--color-text);
+  border-color: var(--color-primary);
+  background: var(--glass-effect);
+}
+
+.blockTypeButton.active {
+  background: var(--gradient-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* 드래그 앤 드롭 */
+.dropZone {
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  padding: var(--spacing-2xl);
+  text-align: center;
+  color: var(--color-text-muted);
+  transition: all var(--transition-normal);
+  margin: var(--spacing-lg) 0;
+}
+
+.dropZone.active {
+  border-color: var(--color-primary);
+  background: rgba(0, 164, 149, 0.05);
+  color: var(--color-primary);
+}
+
+.dropZoneText {
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+/* 툴바 */
+.editorToolbar {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-background-light);
+  border-bottom: 1px solid var(--color-divider);
+  flex-wrap: wrap;
+}
+
+.toolbarButton {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.toolbarButton:hover {
+  color: var(--color-text);
+  background: var(--glass-effect);
+}
+
+.toolbarButton.active {
+  color: var(--color-primary);
+  background: rgba(0, 164, 149, 0.1);
+}
+
+.toolbarDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-divider);
+  margin: 0 var(--spacing-xs);
+}
+
+/* 실시간 미리보기 */
+.splitView {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  height: 100%;
+}
+
+.editorPane {
+  display: flex;
+  flex-direction: column;
+}
+
+.previewPane {
+  background: var(--color-background-light);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: auto;
+  padding: var(--spacing-lg);
+}
+
+.previewContent {
+  font-family: var(--font-family-korean);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text);
+}
+
+/* 자동 저장 표시 */
+.autoSaveStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.autoSaveIndicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: pulse 2s infinite;
+}
+
+.autoSaveIndicator.saving {
+  background: var(--color-warning);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 키보드 단축키 힌트 */
+.shortcutHint {
+  position: absolute;
+  bottom: var(--spacing-md);
+  right: var(--spacing-md);
+  background: var(--color-background-lighter);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+.blockItem:hover .shortcutHint {
+  opacity: 1;
+}
+
+/* 반응형 최적화 */
+@media (max-width: 1024px) {
+  .splitView {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+  
+  .previewPane {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .wikiEditor {
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  .editorHeader {
+    padding: var(--spacing-lg);
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+  
+  .editorActions {
+    justify-content: stretch;
+  }
+  
+  .editorContent {
+    padding: var(--spacing-lg);
+  }
+  
+  .blockTypeSelector {
+    gap: var(--spacing-xs);
+  }
+  
+  .blockTypeButton {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-xs);
+  }
+  
+  .editorToolbar {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-xs);
+  }
+  
+  .metaFields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 모달 스타일 */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  animation: overlay-show 0.3s ease-out;
+}
+
+@keyframes overlay-show {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalContent {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 900px;
+  height: 80vh;
+  background: var(--gradient-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-xl);
+  z-index: 10001;
+  display: flex;
+  flex-direction: column;
+  animation: modal-show 0.3s ease-out;
+}
+
+@keyframes modal-show {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xl) var(--spacing-2xl);
+  border-bottom: 1px solid var(--color-divider);
+  background: linear-gradient(135deg, var(--glass-effect), transparent);
+}
+
+.modalTitle {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.modalBody {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* 접근성 개선 */
+.blockItem:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 모달 반응형 */
+@media (max-width: 768px) {
+  .modalContent {
+    width: 95vw;
+    height: 90vh;
+    border-radius: 16px;
+  }
+  
+  .modalHeader {
+    padding: var(--spacing-lg);
+  }
+  
+  .modalTitle {
+    font-size: var(--font-size-lg);
+  }
+  
+  .modalBody {
+    padding: var(--spacing-lg);
+  }
+}
